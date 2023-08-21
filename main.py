@@ -1,11 +1,16 @@
 import tkinter as tk
 import subprocess
 import threading
-DIR = "ここにユーザー名\\Videos\\yt-dlp-data"
+DIR = "USER\\Videos\\yt-dlp-data"
 BROWSER = "firefox"
+VERSION = "ver 1.2"
 
 def run_command(command):
     try:
+        run_show.delete(1.0, tk.END)
+        run_show.insert(tk.END, "True")
+        run_frame.configure(bg="Red")
+        run_label.configure(bg="Red")
         process = subprocess.Popen(
             command,
             shell=True,
@@ -19,16 +24,21 @@ def run_command(command):
         # コマンドの実行結果を逐次表示
         for line in process.stdout:
             results_text.insert(tk.END, line)
-            results_text.see(tk.END)  # 最新の行が表示されるようにスクロール
-
-        process.wait()  # コマンドの終了を待つ
+            results_text.see(tk.END)
+            
+        process.wait() 
 
     except subprocess.CalledProcessError as e:
         results_text.insert(tk.END, f"Error: {e.output}\n")
+        
+    run_show.delete(1.0, tk.END)
+    run_show.insert(tk.END, "False")
+    run_frame.configure(bg="aquamarine")
+    run_label.configure(bg="aquamarine")
 
 
 def execute_command(kind):
-    global results_text  # グローバル変数として宣言
+    global results_text
     url = url_entry.get()
     lang = lang_entry.get()
     num = num_entry.get()
@@ -59,24 +69,9 @@ def execute_command(kind):
     elif kind == 11:
         command = f'yt-dlp -f {num} -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
 
-    # テキストボックスをクリア
-    results_text.delete(1.0, tk.END)
-
     # コマンド実行を非同期に行うためのスレッドを開始
     thread = threading.Thread(target=run_command, args=(command,))
     thread.start()
-
-
-# def handle_interrupt():
-#     try:
-#         global running_process
-#         running_process.terminate()
-#         results_text.delete(1.0, tk.END)
-#         results_text.insert(tk.END, "Command execution interrupted.\n")
-#     except AttributeError:
-#         results_text.delete(1.0, tk.END)
-#         results_text.insert(tk.END, "No command is currently running.\n")
-
 
 # GUIの設定
 root = tk.Tk()
@@ -102,7 +97,7 @@ title_label = tk.Label(
 )
 title_label.pack(side=tk.LEFT)
 
-version = tk.Label(input_frame, text="ver. 1.1", font=("Arial", 16), bg="gray100")
+version = tk.Label(input_frame, text=f"{VERSION}", font=("Arial", 16), bg="gray100")
 version.pack()
 
 br = tk.Label(input_frame, text="\n", font=("Arial", 32), bg="gray100")
@@ -150,17 +145,19 @@ num_entry.pack(side=tk.LEFT)
 br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
 br.pack()
 
-# # 中断ボタン
-# interrupt_frame = tk.Frame(input_frame, padx=5, pady=5)
-# interrupt_frame.pack(anchor=tk.W)
-# interrupt_button = tk.Button(
-#     interrupt_frame,
-#     text="中断",
-#     command=handle_interrupt,
-#     font=("Arial", 16),
-#     bg="OrangeRed1",
-# )
-# interrupt_button.pack()
+# isRunning欄
+run_frame = tk.Frame(
+    input_frame, padx=5, pady=5, bg="aquamarine", relief=tk.RIDGE, bd=5
+)
+run_frame.pack(anchor=tk.W)
+run_label = tk.Label(
+    run_frame, text="isRunning", font=("Arial", 16), anchor=tk.W, bg="aquamarine"
+)
+run_label.pack(side=tk.LEFT)
+run_show = tk.Text(run_frame, height=1, width=10, font=("Arial", 24))
+run_show.pack(side=tk.LEFT)
+
+run_show.insert(tk.END, "False")
 
 ############################################
 
