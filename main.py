@@ -1,9 +1,10 @@
 import tkinter as tk
 import subprocess
 import threading
-DIR = "USER\\Videos\\yt-dlp-data"
+DIR = "C:\\Users\\ユーザー名\\Videos\\yt-dlp-data"
 BROWSER = "firefox"
-VERSION = "ver 1.2"
+VERSION = "ver 1.2.1"
+
 
 def run_command(command):
     try:
@@ -25,12 +26,12 @@ def run_command(command):
         for line in process.stdout:
             results_text.insert(tk.END, line)
             results_text.see(tk.END)
-            
-        process.wait() 
+
+        process.wait()
 
     except subprocess.CalledProcessError as e:
         results_text.insert(tk.END, f"Error: {e.output}\n")
-        
+
     run_show.delete(1.0, tk.END)
     run_show.insert(tk.END, "False")
     run_frame.configure(bg="aquamarine")
@@ -43,27 +44,23 @@ def execute_command(kind):
     lang = lang_entry.get()
     num = num_entry.get()
     if kind == 1:
-        command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
     elif kind == 2:
-        command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
     elif kind == 3:
-        command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
     elif kind == 4:
-        command = f'yt-dlp -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
     elif kind == 5:
-        command = f'yt-dlp -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --write-auto-sub --sub-lang {lang} --skip-download {url}'
+        command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --write-auto-sub --sub-lang {lang} --skip-download {url}'
     elif kind == 6:
         command = f"yt-dlp --list-formats {url}"
     elif kind == 7:
-        command = (
-            f'yt-dlp -f {num} -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
-        )
+        command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
     elif kind == 8:
-        command = (
-            f'yt-dlp -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --live-from-start {url}'
-        )
+        command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --live-from-start {url}'
     elif kind == 9:
-        command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
+        command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
     elif kind == 10:
         command = f"yt-dlp --list-formats --cookies-from-browser {BROWSER} {url}"
     elif kind == 11:
@@ -72,6 +69,7 @@ def execute_command(kind):
     # コマンド実行を非同期に行うためのスレッドを開始
     thread = threading.Thread(target=run_command, args=(command,))
     thread.start()
+
 
 # GUIの設定
 root = tk.Tk()
@@ -304,7 +302,7 @@ execute_button_9.pack(side=tk.LEFT)
 frame10 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame10.pack(anchor=tk.W)
 text_label10 = tk.Label(
-    frame10, text="プレミアムでリスト取得(要Premium)", font=("Arial", 12), bg="gray100"
+    frame10, text="プレミアムでリストを表示(要Premium)", font=("Arial", 12), bg="gray100"
 )
 text_label10.pack(side=tk.LEFT)
 execute_button_10 = tk.Button(
@@ -320,7 +318,7 @@ execute_button_10.pack(side=tk.LEFT)
 frame11 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame11.pack(anchor=tk.W)
 text_label11 = tk.Label(
-    frame11, text="プレミアム権限でフォーマット指定ダウンロード(要Premium)", font=("Arial", 12), bg="gray100"
+    frame11, text="プレミアムでフォーマットを指定してダウンロード(要Premium)", font=("Arial", 12), bg="gray100"
 )
 text_label11.pack(side=tk.LEFT)
 execute_button_11 = tk.Button(
