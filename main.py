@@ -64,7 +64,7 @@ def execute_command(kind):
     elif kind == 10:
         command = f"yt-dlp --list-formats --cookies-from-browser {BROWSER} {url}"
     elif kind == 11:
-        command = f'yt-dlp -f {num} -o "C:\\Users\\{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
+        command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
 
     # コマンド実行を非同期に行うためのスレッドを開始
     thread = threading.Thread(target=run_command, args=(command,))
