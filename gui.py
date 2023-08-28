@@ -1,17 +1,24 @@
 import tkinter as tk
 import subprocess
 import threading
-DIR = "C:\\Users\\ユーザー名\\Videos\\yt-dlp-data"
-BROWSER = "firefox"
-VERSION = "ver 1.2.1"
+import json
+
+VERSION = "ver 1.3"
+
+with open("config.json", "r") as json_file:
+    data = json.load(json_file)
+DIR = data["DIR"]
+BROWSER = data["BROWSER"]
+stopSrc = False
 
 
 def run_command(command):
     try:
-        run_show.delete(1.0, tk.END)
-        run_show.insert(tk.END, "True")
+        run_show.configure(text="True")
         run_frame.configure(bg="Red")
         run_label.configure(bg="Red")
+        url_entry.configure(state="disabled")
+        results_text.configure(state="normal")
         process = subprocess.Popen(
             command,
             shell=True,
@@ -25,17 +32,32 @@ def run_command(command):
         # コマンドの実行結果を逐次表示
         for line in process.stdout:
             results_text.insert(tk.END, line)
-            results_text.see(tk.END)
+            if stopSrc == False:
+                results_text.see(tk.END)
 
         process.wait()
 
     except subprocess.CalledProcessError as e:
         results_text.insert(tk.END, f"Error: {e.output}\n")
 
-    run_show.delete(1.0, tk.END)
-    run_show.insert(tk.END, "False")
+    run_show.configure(text="False")
     run_frame.configure(bg="aquamarine")
     run_label.configure(bg="aquamarine")
+    url_entry.configure(state="normal")
+    results_text.configure(state="disabled")
+
+
+def Scrolling():
+    global stopSrc
+    if stopSrc == True:
+        stopScr_button.configure(text="スクロール停止")
+        stopSrc = False
+        results_text.see(tk.END)
+        stopScr_state.configure(text="")
+    else:
+        stopScr_button.configure(text="スクロール再開")
+        stopSrc = True
+        stopScr_state.configure(text="スクロール停止中")
 
 
 def execute_command(kind):
@@ -123,7 +145,7 @@ lang_label = tk.Label(
     lang_frame, text="lang", font=("Arial", 16), anchor=tk.W, bg="alice blue"
 )
 lang_label.pack(side=tk.LEFT)
-lang_entry = tk.Entry(lang_frame, width=10)
+lang_entry = tk.Entry(lang_frame, width=10, justify=tk.CENTER)
 lang_entry.pack(side=tk.LEFT)
 
 lang_entry.insert(0, "ja")
@@ -137,7 +159,7 @@ num_label = tk.Label(
     num_frame, text="num", font=("Arial", 16), anchor=tk.W, bg="LightGreen"
 )
 num_label.pack(side=tk.LEFT)
-num_entry = tk.Entry(num_frame, width=10)
+num_entry = tk.Entry(num_frame, width=10, justify=tk.CENTER)
 num_entry.pack(side=tk.LEFT)
 
 br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
@@ -152,10 +174,31 @@ run_label = tk.Label(
     run_frame, text="isRunning", font=("Arial", 16), anchor=tk.W, bg="aquamarine"
 )
 run_label.pack(side=tk.LEFT)
-run_show = tk.Text(run_frame, height=1, width=10, font=("Arial", 24))
+run_show = tk.Label(run_frame, height=1, width=10, text="False", font=("Arial", 24))
 run_show.pack(side=tk.LEFT)
 
-run_show.insert(tk.END, "False")
+br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
+br.pack()
+
+# stopScrolling
+stopScr_frame = tk.Frame(
+    input_frame, padx=5, pady=5, bg="LightGoldenrod1", relief=tk.RIDGE, bd=5
+)
+stopScr_frame.pack(anchor=tk.W)
+stopScr_button = tk.Button(
+    stopScr_frame,
+    text="スクロール停止",
+    command=lambda: Scrolling(),
+    font=("Arial", 12),
+    bg="gray100",
+)
+stopScr_button.pack(side=tk.LEFT)
+
+stopScr_state = tk.Label(
+    stopScr_frame, text="", font=("Arial", 16), bg="LightGoldenrod1"
+)
+stopScr_state.pack()
+
 
 ############################################
 
@@ -165,10 +208,6 @@ button_frame.pack(side=tk.RIGHT)
 # ボタン1
 frame1 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame1.pack(anchor=tk.W)
-text_label1 = tk.Label(
-    frame1, text="通常ダウンロード", font=("Arial", 12), anchor=tk.W, bg="gray100"
-)
-text_label1.pack(side=tk.LEFT)
 execute_button_1 = tk.Button(
     frame1,
     text="実行",
@@ -177,14 +216,15 @@ execute_button_1 = tk.Button(
     bg="gray100",
 )
 execute_button_1.pack(side=tk.LEFT)
+text_label1 = tk.Label(
+    frame1, text="通常ダウンロード", font=("Arial", 12), anchor=tk.W, bg="gray100"
+)
+text_label1.pack(side=tk.LEFT)
+
 
 # ボタン2
 frame2 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame2.pack(anchor=tk.W)
-text_label2 = tk.Label(
-    frame2, text="音声ダウンロード", font=("Arial", 12), anchor=tk.W, bg="gray100"
-)
-text_label2.pack(side=tk.LEFT)
 execute_button_2 = tk.Button(
     frame2,
     text="実行",
@@ -193,12 +233,15 @@ execute_button_2 = tk.Button(
     bg="gray100",
 )
 execute_button_2.pack(side=tk.LEFT)
+text_label2 = tk.Label(
+    frame2, text="音声ダウンロード", font=("Arial", 12), anchor=tk.W, bg="gray100"
+)
+text_label2.pack(side=tk.LEFT)
+
 
 # ボタン3
 frame3 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame3.pack(anchor=tk.W)
-text_label3 = tk.Label(frame3, text="高品質ダウンロード", font=("Arial", 12), bg="gray100")
-text_label3.pack(side=tk.LEFT)
 execute_button_3 = tk.Button(
     frame3,
     text="実行",
@@ -207,14 +250,13 @@ execute_button_3 = tk.Button(
     bg="gray100",
 )
 execute_button_3.pack(side=tk.LEFT)
+text_label3 = tk.Label(frame3, text="高品質ダウンロード", font=("Arial", 12), bg="gray100")
+text_label3.pack(side=tk.LEFT)
+
 
 # ボタン4
 frame4 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame4.pack(anchor=tk.W)
-text_label4 = tk.Label(
-    frame4, text="フォーマットが非対応の場合(自動でフォーマットが選ばれます)", font=("Arial", 12), bg="gray100"
-)
-text_label4.pack(side=tk.LEFT)
 execute_button_4 = tk.Button(
     frame4,
     text="実行",
@@ -223,12 +265,15 @@ execute_button_4 = tk.Button(
     bg="gray100",
 )
 execute_button_4.pack(side=tk.LEFT)
+text_label4 = tk.Label(
+    frame4, text="フォーマットが非対応の場合(自動でフォーマットが選ばれます)", font=("Arial", 12), bg="gray100"
+)
+text_label4.pack(side=tk.LEFT)
+
 
 # ボタン5
 frame5 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame5.pack(anchor=tk.W)
-text_label5 = tk.Label(frame5, text="字幕のみダウンロード", font=("Arial", 12), bg="gray100")
-text_label5.pack(side=tk.LEFT)
 execute_button_5 = tk.Button(
     frame5,
     text="実行",
@@ -237,12 +282,13 @@ execute_button_5 = tk.Button(
     bg="gray100",
 )
 execute_button_5.pack(side=tk.LEFT)
+text_label5 = tk.Label(frame5, text="字幕のみダウンロード", font=("Arial", 12), bg="gray100")
+text_label5.pack(side=tk.LEFT)
+
 
 # ボタン6
 frame6 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame6.pack(anchor=tk.W)
-text_label6 = tk.Label(frame6, text="リストを表示", font=("Arial", 12), bg="gray100")
-text_label6.pack(side=tk.LEFT)
 execute_button_6 = tk.Button(
     frame6,
     text="実行",
@@ -251,14 +297,13 @@ execute_button_6 = tk.Button(
     bg="gray100",
 )
 execute_button_6.pack(side=tk.LEFT)
+text_label6 = tk.Label(frame6, text="リストを表示", font=("Arial", 12), bg="gray100")
+text_label6.pack(side=tk.LEFT)
+
 
 # ボタン7
 frame7 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame7.pack(anchor=tk.W)
-text_label7 = tk.Label(
-    frame7, text="フォーマットを指定してダウンロード", font=("Arial", 12), bg="gray100"
-)
-text_label7.pack(side=tk.LEFT)
 execute_button_7 = tk.Button(
     frame7,
     text="実行",
@@ -267,12 +312,15 @@ execute_button_7 = tk.Button(
     bg="gray100",
 )
 execute_button_7.pack(side=tk.LEFT)
+text_label7 = tk.Label(
+    frame7, text="フォーマットを指定してダウンロード", font=("Arial", 12), bg="gray100"
+)
+text_label7.pack(side=tk.LEFT)
+
 
 # ボタン8
 frame8 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame8.pack(anchor=tk.W)
-text_label8 = tk.Label(frame8, text="配信を録画", font=("Arial", 12), bg="gray100")
-text_label8.pack(side=tk.LEFT)
 execute_button_8 = tk.Button(
     frame8,
     text="実行",
@@ -281,14 +329,13 @@ execute_button_8 = tk.Button(
     bg="gray100",
 )
 execute_button_8.pack(side=tk.LEFT)
+text_label8 = tk.Label(frame8, text="配信を録画", font=("Arial", 12), bg="gray100")
+text_label8.pack(side=tk.LEFT)
+
 
 # ボタン9
 frame9 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame9.pack(anchor=tk.W)
-text_label9 = tk.Label(
-    frame9, text="プレミアムミュージック(要Premium)", font=("Arial", 12), bg="gray100"
-)
-text_label9.pack(side=tk.LEFT)
 execute_button_9 = tk.Button(
     frame9,
     text="実行",
@@ -297,14 +344,15 @@ execute_button_9 = tk.Button(
     bg="gray100",
 )
 execute_button_9.pack(side=tk.LEFT)
+text_label9 = tk.Label(
+    frame9, text="プレミアムミュージック(要Premium)", font=("Arial", 12), bg="gray100"
+)
+text_label9.pack(side=tk.LEFT)
+
 
 # ボタン10
 frame10 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame10.pack(anchor=tk.W)
-text_label10 = tk.Label(
-    frame10, text="プレミアムでリストを表示(要Premium)", font=("Arial", 12), bg="gray100"
-)
-text_label10.pack(side=tk.LEFT)
 execute_button_10 = tk.Button(
     frame10,
     text="実行",
@@ -313,14 +361,15 @@ execute_button_10 = tk.Button(
     bg="gray100",
 )
 execute_button_10.pack(side=tk.LEFT)
+text_label10 = tk.Label(
+    frame10, text="プレミアムでリストを表示(要Premium)", font=("Arial", 12), bg="gray100"
+)
+text_label10.pack(side=tk.LEFT)
+
 
 # ボタン11
 frame11 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame11.pack(anchor=tk.W)
-text_label11 = tk.Label(
-    frame11, text="プレミアムでフォーマットを指定してダウンロード(要Premium)", font=("Arial", 12), bg="gray100"
-)
-text_label11.pack(side=tk.LEFT)
 execute_button_11 = tk.Button(
     frame11,
     text="実行",
@@ -329,11 +378,17 @@ execute_button_11 = tk.Button(
     bg="gray100",
 )
 execute_button_11.pack(side=tk.LEFT)
+text_label11 = tk.Label(
+    frame11, text="プレミアムでフォーマットを指定してダウンロード(要Premium)", font=("Arial", 12), bg="gray100"
+)
+text_label11.pack(side=tk.LEFT)
 
 ####################
 
 results_text = tk.Text(button_frame, width=140, height=25, bg="black", fg="white")
 results_text.pack(fill=tk.BOTH, expand=True)
+
+results_text.configure(state="disabled")
 
 # GUIループの開始
 root.mainloop()
