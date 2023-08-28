@@ -3,7 +3,7 @@ import subprocess
 import threading
 import json
 
-VERSION = "ver 1.3"
+VERSION = "ver 1.3.1"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -130,7 +130,7 @@ url_label = tk.Label(
     url_frame, text="URL\nここで", font=("Arial", 16), anchor=tk.W, bg="LightPink"
 )
 url_label.pack(side=tk.LEFT)
-url_entry = tk.Entry(url_frame, width=50)
+url_entry = tk.Entry(url_frame, width=50, bg="White")
 url_entry.pack(side=tk.LEFT)
 
 br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
@@ -145,7 +145,7 @@ lang_label = tk.Label(
     lang_frame, text="lang", font=("Arial", 16), anchor=tk.W, bg="alice blue"
 )
 lang_label.pack(side=tk.LEFT)
-lang_entry = tk.Entry(lang_frame, width=10, justify=tk.CENTER)
+lang_entry = tk.Entry(lang_frame, width=10, justify=tk.CENTER, bg="White")
 lang_entry.pack(side=tk.LEFT)
 
 lang_entry.insert(0, "ja")
@@ -159,7 +159,7 @@ num_label = tk.Label(
     num_frame, text="num", font=("Arial", 16), anchor=tk.W, bg="LightGreen"
 )
 num_label.pack(side=tk.LEFT)
-num_entry = tk.Entry(num_frame, width=10, justify=tk.CENTER)
+num_entry = tk.Entry(num_frame, width=10, justify=tk.CENTER, bg="White")
 num_entry.pack(side=tk.LEFT)
 
 br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
@@ -174,7 +174,7 @@ run_label = tk.Label(
     run_frame, text="isRunning", font=("Arial", 16), anchor=tk.W, bg="aquamarine"
 )
 run_label.pack(side=tk.LEFT)
-run_show = tk.Label(run_frame, height=1, width=10, text="False", font=("Arial", 24))
+run_show = tk.Label(run_frame, height=1, width=10, text="False", font=("Arial", 24), bg="White")
 run_show.pack(side=tk.LEFT)
 
 br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
