@@ -4,4 +4,12 @@ Easy GUI for yt-dlp.
 <h3>一切の責任を負いません!!</h3><br>
 
 # How to use
-main.pyの4,5行目を環境に合わせて書き換えてください。
+config.jsonをお使いの環境に合わせて書き換えてください。<br>
+例:
+```
+{
+    "DIR": "C:\\Users\\user\\Videos",
+    "BROWSER": "firefox"
+}
+```
+
