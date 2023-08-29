@@ -4,7 +4,7 @@ import threading
 import json
 import os
 
-VERSION = "ver 1.3.3"
+VERSION = "ver 1.4"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -23,7 +23,7 @@ def run_command(command):
         run_label.configure(bg="Red")
         url_entry.configure(state="disabled")
         results_text.configure(state="normal")
-        results_text.insert(tk.END, f"{CWD}>" + command)
+        results_text.insert(tk.END, f"{CWD}>" + command + "\n")
         process = subprocess.Popen(
             command,
             shell=True,
@@ -98,6 +98,8 @@ def execute_command(kind):
             command = f"yt-dlp --list-formats --cookies-from-browser {BROWSER} {url}"
         elif kind == 11:
             command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
+        elif kind == 12:
+            command = "yt-dlp " + own_entry.get()
 
         # コマンド実行を非同期に行うためのスレッドを開始
         thread = threading.Thread(target=run_command, args=(command,))
@@ -407,6 +409,26 @@ text_label11 = tk.Label(
     frame11, text="プレミアムでフォーマットを指定してダウンロード(要Premium)", font=("Arial", 12), bg="gray100"
 )
 text_label11.pack(side=tk.LEFT)
+
+# ボタン12
+frame12 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
+frame12.pack(anchor=tk.W)
+execute_button_12 = tk.Button(
+    frame12,
+    text="実行",
+    command=lambda: execute_command(12),
+    font=("Arial", 12),
+    bg="gray100",
+)
+execute_button_12.pack(side=tk.LEFT)
+text_label12 = tk.Label(
+    frame12, text="任意コード yt-dlp ", font=("Arial", 12), bg="gray100"
+)
+text_label12.pack(side=tk.LEFT)
+own_entry = tk.Entry(frame12, width=140, bg="White")
+own_entry.pack(side=tk.LEFT)
+
+own_entry.insert(0, "自信がない限り使用しないでください")
 
 ####################
 
