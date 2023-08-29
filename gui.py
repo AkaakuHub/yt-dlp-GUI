@@ -2,18 +2,21 @@ import tkinter as tk
 import subprocess
 import threading
 import json
+import time
 
-VERSION = "ver 1.3.1"
+VERSION = "ver 1.3.2"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
 DIR = data["DIR"]
 BROWSER = data["BROWSER"]
 stopSrc = False
-
+isRunning = False
 
 def run_command(command):
+    global isRunning
     try:
+        isRunning = True
         run_show.configure(text="True")
         run_frame.configure(bg="Red")
         run_label.configure(bg="Red")
@@ -40,11 +43,13 @@ def run_command(command):
     except subprocess.CalledProcessError as e:
         results_text.insert(tk.END, f"Error: {e.output}\n")
 
+    isRunning = False
     run_show.configure(text="False")
     run_frame.configure(bg="aquamarine")
     run_label.configure(bg="aquamarine")
     url_entry.configure(state="normal")
     results_text.configure(state="disabled")
+    notification_label.configure(text="")
 
 
 def Scrolling():
@@ -62,35 +67,40 @@ def Scrolling():
 
 def execute_command(kind):
     global results_text
-    url = url_entry.get()
-    lang = lang_entry.get()
-    num = num_entry.get()
-    if kind == 1:
-        command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
-    elif kind == 2:
-        command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
-    elif kind == 3:
-        command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
-    elif kind == 4:
-        command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
-    elif kind == 5:
-        command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --write-auto-sub --sub-lang {lang} --skip-download {url}'
-    elif kind == 6:
-        command = f"yt-dlp --list-formats {url}"
-    elif kind == 7:
-        command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
-    elif kind == 8:
-        command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --live-from-start {url}'
-    elif kind == 9:
-        command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
-    elif kind == 10:
-        command = f"yt-dlp --list-formats --cookies-from-browser {BROWSER} {url}"
-    elif kind == 11:
-        command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
+    global isRunning
+    if isRunning:
+        notification_label.configure(text="他のコマンドが実行中です")
+        return
+    else:
+        url = url_entry.get()
+        lang = lang_entry.get()
+        num = num_entry.get()
+        if kind == 1:
+            command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        elif kind == 2:
+            command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        elif kind == 3:
+            command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        elif kind == 4:
+            command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        elif kind == 5:
+            command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --write-auto-sub --sub-lang {lang} --skip-download {url}'
+        elif kind == 6:
+            command = f"yt-dlp --list-formats {url}"
+        elif kind == 7:
+            command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+        elif kind == 8:
+            command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --live-from-start {url}'
+        elif kind == 9:
+            command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
+        elif kind == 10:
+            command = f"yt-dlp --list-formats --cookies-from-browser {BROWSER} {url}"
+        elif kind == 11:
+            command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
 
-    # コマンド実行を非同期に行うためのスレッドを開始
-    thread = threading.Thread(target=run_command, args=(command,))
-    thread.start()
+        # コマンド実行を非同期に行うためのスレッドを開始
+        thread = threading.Thread(target=run_command, args=(command,))
+        thread.start()
 
 
 # GUIの設定
@@ -174,7 +184,9 @@ run_label = tk.Label(
     run_frame, text="isRunning", font=("Arial", 16), anchor=tk.W, bg="aquamarine"
 )
 run_label.pack(side=tk.LEFT)
-run_show = tk.Label(run_frame, height=1, width=10, text="False", font=("Arial", 24), bg="White")
+run_show = tk.Label(
+    run_frame, height=1, width=10, text="False", font=("Arial", 24), bg="White"
+)
 run_show.pack(side=tk.LEFT)
 
 br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
@@ -199,6 +211,18 @@ stopScr_state = tk.Label(
 )
 stopScr_state.pack()
 
+br = tk.Label(input_frame, text="\n", font=("Arial", 12), bg="gray100")
+br.pack()
+
+# notification欄
+notification_frame = tk.Frame(
+    input_frame, padx=5, pady=5, bg="gray100", bd=5
+)
+notification_frame.pack(anchor=tk.W)
+notification_label = tk.Label(
+    notification_frame, text="", font=("Arial", 16), anchor=tk.W, bg="gray100"
+)
+notification_label.pack(side=tk.LEFT)
 
 ############################################
 
