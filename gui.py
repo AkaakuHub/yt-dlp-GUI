@@ -4,7 +4,7 @@ import threading
 import json
 import os
 
-VERSION = "ver 1.4.1"
+VERSION = "ver 1.4.2"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -135,7 +135,7 @@ title_label.pack(side=tk.LEFT)
 version = tk.Label(input_frame, text=f"{VERSION}", font=("Arial", 16), bg="gray100")
 version.pack()
 
-br = tk.Label(input_frame, text="\n", font=("Arial", 32), bg="gray100")
+br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
 br.pack()
 
 # URL入力欄
@@ -221,7 +221,7 @@ br.pack()
 
 # フォルダ開く
 save_frame = tk.Frame(
-    input_frame, padx=5, pady=5, bg="aquamarine", relief=tk.RIDGE, bd=5
+    input_frame, padx=5, pady=5, bg="LightSlateBlue", relief=tk.RIDGE, bd=5
 )
 save_frame.pack(anchor=tk.W)
 save_button = tk.Button(
