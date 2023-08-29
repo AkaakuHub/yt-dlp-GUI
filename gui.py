@@ -2,14 +2,15 @@ import tkinter as tk
 import subprocess
 import threading
 import json
-import time
+import os
 
-VERSION = "ver 1.3.2"
+VERSION = "ver 1.3.3"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
 DIR = data["DIR"]
 BROWSER = data["BROWSER"]
+CWD = os.getcwd()
 stopSrc = False
 isRunning = False
 
@@ -22,6 +23,7 @@ def run_command(command):
         run_label.configure(bg="Red")
         url_entry.configure(state="disabled")
         results_text.configure(state="normal")
+        results_text.insert(tk.END, f"{CWD}>" + command)
         process = subprocess.Popen(
             command,
             shell=True,
@@ -32,7 +34,6 @@ def run_command(command):
             errors="ignore",
         )
 
-        # コマンドの実行結果を逐次表示
         for line in process.stdout:
             results_text.insert(tk.END, line)
             if stopSrc == False:
