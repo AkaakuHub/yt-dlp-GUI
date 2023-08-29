@@ -4,12 +4,13 @@ import threading
 import json
 import os
 
-VERSION = "ver 1.4"
+VERSION = "ver 1.4.1"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
 DIR = data["DIR"]
 BROWSER = data["BROWSER"]
+SAVEDIR = data["SAVEDIR"]
 CWD = os.getcwd()
 stopSrc = False
 isRunning = False
@@ -105,6 +106,8 @@ def execute_command(kind):
         thread = threading.Thread(target=run_command, args=(command,))
         thread.start()
 
+def open_savedir():
+    os.startfile(SAVEDIR)
 
 # GUIの設定
 root = tk.Tk()
@@ -214,7 +217,24 @@ stopScr_state = tk.Label(
 )
 stopScr_state.pack()
 
-br = tk.Label(input_frame, text="\n", font=("Arial", 12), bg="gray100")
+br = tk.Label(input_frame, text="\n", font=("Arial", 4), bg="gray100")
+br.pack()
+
+# フォルダ開く
+save_frame = tk.Frame(
+    input_frame, padx=5, pady=5, bg="aquamarine", relief=tk.RIDGE, bd=5
+)
+save_frame.pack(anchor=tk.W)
+save_button = tk.Button(
+    save_frame,
+    text="フォルダを開く",
+    command=lambda: open_savedir(),
+    font=("Arial", 12),
+    bg="gray100",
+)
+save_button.pack(side=tk.LEFT)
+
+br = tk.Label(input_frame, text="\n", font=("Arial", 4), bg="gray100")
 br.pack()
 
 # notification欄
