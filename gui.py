@@ -10,7 +10,6 @@ with open("config.json", "r") as json_file:
     data = json.load(json_file)
 DIR = data["DIR"]
 BROWSER = data["BROWSER"]
-SAVEDIR = data["SAVEDIR"]
 CWD = os.getcwd()
 stopSrc = False
 isRunning = False
@@ -107,7 +106,7 @@ def execute_command(kind):
         thread.start()
 
 def open_savedir():
-    os.startfile(SAVEDIR)
+    os.startfile(DIR)
 
 # GUIの設定
 root = tk.Tk()
