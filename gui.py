@@ -4,7 +4,7 @@ import threading
 import json
 import os
 
-VERSION = "ver 1.4.2"
+VERSION = "ver 1.5.0"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -135,7 +135,7 @@ title_label.pack(side=tk.LEFT)
 version = tk.Label(input_frame, text=f"{VERSION}", font=("Arial", 16), bg="gray100")
 version.pack()
 
-br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
+br = tk.Label(input_frame, text="\n", font=("Arial", 8), bg="gray100")
 br.pack()
 
 # URL入力欄
@@ -148,7 +148,7 @@ url_label.pack(side=tk.LEFT)
 url_entry = tk.Entry(url_frame, width=50, bg="White")
 url_entry.pack(side=tk.LEFT)
 
-br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
+br = tk.Label(input_frame, text="\n", font=("Arial", 8), bg="gray100")
 br.pack()
 
 # lang入力欄
@@ -177,7 +177,7 @@ num_label.pack(side=tk.LEFT)
 num_entry = tk.Entry(num_frame, width=10, justify=tk.CENTER, bg="White")
 num_entry.pack(side=tk.LEFT)
 
-br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
+br = tk.Label(input_frame, text="\n", font=("Arial", 8), bg="gray100")
 br.pack()
 
 # isRunning欄
@@ -194,7 +194,7 @@ run_show = tk.Label(
 )
 run_show.pack(side=tk.LEFT)
 
-br = tk.Label(input_frame, text="\n", font=("Arial", 16), bg="gray100")
+br = tk.Label(input_frame, text="\n", font=("Arial", 8), bg="gray100")
 br.pack()
 
 # stopScrolling
@@ -245,6 +245,69 @@ notification_label = tk.Label(
     notification_frame, text="", font=("Arial", 16), anchor=tk.W, bg="gray100"
 )
 notification_label.pack(side=tk.LEFT)
+
+br = tk.Label(input_frame, text="\n", font=("Arial", 4), bg="gray100")
+br.pack()
+
+# 保存ディレクトリ
+save_dir_frame = tk.Frame(
+    input_frame, padx=5, pady=5, bg="moccasin", relief=tk.RIDGE, bd=5
+)
+save_dir_frame.pack(anchor=tk.W)
+save_dir_label = tk.Label(
+    save_dir_frame, text="保存ディレクトリ", font=("Arial", 8), anchor=tk.W, bg="moccasin"
+)
+save_dir_label.pack(side=tk.LEFT)
+
+save_dir_entry = tk.Entry(save_dir_frame, width=40, bg="White")
+save_dir_entry.pack(side=tk.LEFT)
+
+# まず、jsonのDIRを読み込む
+save_dir_entry.insert(0, DIR)
+
+# もし変更されたら、jsonに書き込む
+def save_dir_changed(event):
+    global DIR
+    data["DIR"] = save_dir_entry.get()
+    with open("config.json", "w") as json_file:
+        json.dump(data, json_file, indent=4)
+    DIR = data["DIR"]
+
+# 設定のセーブ
+save_dir_entry.bind("<Return>", save_dir_changed)
+
+# 使用ブラウザ(Cookieの場合)(高度な設定)
+browser_frame = tk.Frame(
+    input_frame, padx=5, pady=5, bg="LightSalmon", relief=tk.RIDGE, bd=5
+)
+browser_frame.pack(anchor=tk.W)
+browser_label = tk.Label(
+    browser_frame, text="使用ブラウザ(Cookieの場合)(高度な設定)", font=("Arial", 8), anchor=tk.W, bg="LightSalmon"
+)
+browser_label.pack(side=tk.LEFT)
+
+browser_entry = tk.Entry(browser_frame, width=10, bg="White")
+browser_entry.pack(side=tk.LEFT)
+
+# まず、jsonのBROWSERを読み込む
+browser_entry.insert(0, BROWSER)
+
+# もし変更されたら、jsonに書き込む
+def browser_changed(event):
+    global BROWSER
+    data["BROWSER"] = browser_entry.get()
+    with open("config.json", "w") as json_file:
+        json.dump(data, json_file, indent=4)
+    BROWSER = data["BROWSER"]
+
+# 設定のセーブ
+browser_entry.bind("<Return>", browser_changed)
+
+# 変更したらエンターキーを押してください、という文字を表示
+changed_label = tk.Label(
+    input_frame, text="変更したらエンターキーを押してください", font=("Arial", 8), anchor=tk.W, bg="gray100"
+)
+changed_label.pack(side=tk.LEFT)
 
 ############################################
 
