@@ -17,7 +17,7 @@ Easy GUI for yt-dlp.
 ```ffmpeg-master-latest-win64-gpl.zip```
 をダウンロードし、展開してから、
 ```ffmpeg.exe```と```ffprobe.exe```
-を先程と同じディレクトリに移動する。<br><br>
+を先程と同じユーザーディレクトリに移動する。<br><br>
 
 # How to use
 
