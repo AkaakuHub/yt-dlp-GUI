@@ -1,7 +1,7 @@
 # yt-dlp-GUI
 Easy GUI for yt-dlp. 
-<h3>I don't take any responsibility!!</h3>
-<h3>一切の責任を負いません!!</h3><br>
+<h3>I don't take any responsibility caused by using this application!!</h3>
+<h3>このアプリケーションの使用により生じる一切の責任を負いません!!</h3><br>
 
 # Installation
 あまり詳しくない場合はパッケージ版をおすすめします。
@@ -19,3 +19,7 @@ Easy GUI for yt-dlp.
 ```ffmpeg.exe```と```ffprobe.exe```
 を先程と同じディレクトリに移動する。<br><br>
 
+# How to use
+
+アプリを起動し、URLを入力したら任意のボタンを押すと実行できます。<br>
+よく分からない場合は通常ダウンロードで良いです。
