@@ -8,7 +8,7 @@ Easy GUI for yt-dlp.
 <h3>I don't take any responsibility caused by using this application!!</h3>
 <h3>このアプリケーションの使用により生じる一切の責任を負いません!!</h3><br>
 
-# Installation
+# Installation/インストール
 あまり詳しくない場合はパッケージ版をおすすめします。
 
 ・パッケージ版の導入方法
@@ -24,7 +24,7 @@ Easy GUI for yt-dlp.
 ```ffmpeg.exe```と```ffprobe.exe```
 を先程と同じユーザーディレクトリに移動する。<br><br>
 
-# How to use
+# How to use/使い方
 
 初回使用の場合、まず保存ディレクトリを入力してEnterキーを押すことで登録してください。
 (設定は保存されます。)<br>
