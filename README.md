@@ -2,6 +2,7 @@
 <img src="https://shields.io/badge/Windows--9cf?logo=Windows&style=social">
 <img src="https://img.shields.io/badge/Python-3.10-yellow.svg">
 </div>
+
 # yt-dlp-GUI
 Easy GUI for yt-dlp. 
 <h3>I don't take any responsibility caused by using this application!!</h3>
