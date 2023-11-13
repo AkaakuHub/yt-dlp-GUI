@@ -8,7 +8,7 @@ Easy GUI for yt-dlp.
 
 ・パッケージ版の導入方法
 
-1.<h5><a href="https://raw.githubusercontent.com/AkaakuHub/yt-dlp-GUI/main/yt-dlp-gui.zip">ここ</a></h5>からzipファイルをダウンロードし、アプリケーションを配置したい場所で展開する。<br><br>
+1.<span style="font-size:200%;"><a href="https://raw.githubusercontent.com/AkaakuHub/yt-dlp-GUI/main/yt-dlp-gui.zip">ここ</a></span>からzipファイルをダウンロードし、アプリケーションを配置したい場所で展開する。<br><br>
 2.<a href="https://github.com/yt-dlp/yt-dlp/releases">ここ</a>にある最新バージョンのリリース("Latest"と書いてあるやつ)から
 ```yt-dlp.exe```
 をダウンロードし、それをユーザーディレクトリ(例.Windowsの場合、C:\\Users\\ユーザー名\\
