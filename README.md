@@ -8,12 +8,12 @@ Easy GUI for yt-dlp.
 
 ・パッケージ版の導入方法
 
-1.**[ここ](https://raw.githubusercontent.com/AkaakuHub/yt-dlp-GUI/main/yt-dlp-gui.zip)**からzipファイルをダウンロードし、アプリケーションを配置したい場所で展開する。<br><br>
-2.<a href="https://github.com/yt-dlp/yt-dlp/releases">ここ</a>にある最新バージョンのリリース("Latest"と書いてあるやつ)から
+1.[ここ](https://raw.githubusercontent.com/AkaakuHub/yt-dlp-GUI/main/yt-dlp-gui.zip)からzipファイルをダウンロードし、アプリケーションを配置したい場所で展開する。<br><br>
+2.[ここ](https://github.com/yt-dlp/yt-dlp/releases)にある最新バージョンのリリース("Latest"と書いてあるやつ)から
 ```yt-dlp.exe```
 をダウンロードし、それをユーザーディレクトリ(例.Windowsの場合、C:\\Users\\ユーザー名\\
 )に移動する。<br><br>
-3.<a href="https://github.com/yt-dlp/FFmpeg-Builds/releases/">ここ</a>にある最新バージョンのリリース("Latest"と書いてあるやつ)から
+3.[ここ](https://github.com/yt-dlp/FFmpeg-Builds/releases/)にある最新バージョンのリリース("Latest"と書いてあるやつ)から
 ```ffmpeg-master-latest-win64-gpl.zip```
 をダウンロードし、展開してから、
 ```ffmpeg.exe```と```ffprobe.exe```
