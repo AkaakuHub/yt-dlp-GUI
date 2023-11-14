@@ -4,7 +4,7 @@ import threading
 import json
 import os
 
-VERSION = "ver 1.5.0"
+VERSION = "ver 1.5.1"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -30,7 +30,8 @@ def run_command(command):
             text=True,
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            encoding="utf-8",
+            # encoding="utf-8", 文字化けする
+            encoding="cp932",
             errors="ignore",
         )
 
@@ -77,29 +78,32 @@ def execute_command(kind):
         lang = lang_entry.get()
         num = num_entry.get()
         if kind == 1:
-            command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" --no-mtime'
         elif kind == 2:
-            command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f "bestaudio[ext=m4a]" --no-mtime'
         elif kind == 3:
-            command = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --no-mtime'
         elif kind == 4:
-            command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime'
         elif kind == 5:
-            command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --write-auto-sub --sub-lang {lang} --skip-download {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" --write-auto-sub --sub-lang {lang} --skip-download'
         elif kind == 6:
-            command = f"yt-dlp --list-formats {url}"
+            command = f'yt-dlp {url} --list-formats'
         elif kind == 7:
-            command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f {num} --no-mtime'
         elif kind == 8:
-            command = f'yt-dlp -o "{DIR}\\%(title)s.%(ext)s" --live-from-start {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" --live-from-start'
         elif kind == 9:
-            command = f'yt-dlp -f "bestaudio[ext=m4a]" -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f "bestaudio[ext=m4a]" --no-mtime --cookies-from-browser {BROWSER}'
         elif kind == 10:
-            command = f"yt-dlp --list-formats --cookies-from-browser {BROWSER} {url}"
+            command = f'yt-dlp {url} --list-formats --cookies-from-browser {BROWSER}'
         elif kind == 11:
-            command = f'yt-dlp -f {num} -o "{DIR}\\%(title)s.%(ext)s" --no-mtime --cookies-from-browser {BROWSER} {url}'
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f {num} --no-mtime --cookies-from-browser {BROWSER}'
         elif kind == 12:
             command = "yt-dlp " + own_entry.get()
+        elif kind == 13:
+            command = f'yt-dlp {url} -o "{DIR}\\%(title)s_thumbnail.%(ext)s" --write-thumbnail --skip-download --no-mtime'
+
 
         # コマンド実行を非同期に行うためのスレッドを開始
         thread = threading.Thread(target=run_command, args=(command,))
@@ -142,7 +146,7 @@ br.pack()
 url_frame = tk.Frame(input_frame, padx=5, pady=5, bg="LightPink", relief=tk.RIDGE, bd=5)
 url_frame.pack(anchor=tk.W)
 url_label = tk.Label(
-    url_frame, text="URL\nここで", font=("Arial", 16), anchor=tk.W, bg="LightPink"
+    url_frame, text="URL", font=("Arial", 16), anchor=tk.W, bg="LightPink"
 )
 url_label.pack(side=tk.LEFT)
 url_entry = tk.Entry(url_frame, width=50, bg="White")
@@ -157,7 +161,7 @@ lang_frame = tk.Frame(
 )
 lang_frame.pack(anchor=tk.W)
 lang_label = tk.Label(
-    lang_frame, text="lang", font=("Arial", 16), anchor=tk.W, bg="alice blue"
+    lang_frame, text="字幕言語", font=("Arial", 16), anchor=tk.W, bg="alice blue"
 )
 lang_label.pack(side=tk.LEFT)
 lang_entry = tk.Entry(lang_frame, width=10, justify=tk.CENTER, bg="White")
@@ -171,7 +175,7 @@ num_frame = tk.Frame(
 )
 num_frame.pack(anchor=tk.W)
 num_label = tk.Label(
-    num_frame, text="num", font=("Arial", 16), anchor=tk.W, bg="LightGreen"
+    num_frame, text="コーデックID", font=("Arial", 16), anchor=tk.W, bg="LightGreen"
 )
 num_label.pack(side=tk.LEFT)
 num_entry = tk.Entry(num_frame, width=10, justify=tk.CENTER, bg="White")
@@ -305,7 +309,7 @@ browser_entry.bind("<Return>", browser_changed)
 
 # 変更したらエンターキーを押してください、という文字を表示
 changed_label = tk.Label(
-    input_frame, text="変更したらエンターキーを押してください", font=("Arial", 8), anchor=tk.W, bg="gray100"
+    input_frame, text="変更したらエンターキーを押してください", font=("Arial", 12), anchor=tk.W, bg="gray100"
 )
 changed_label.pack(side=tk.LEFT)
 
@@ -317,12 +321,14 @@ button_frame.pack(side=tk.RIGHT)
 # ボタン1
 frame1 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame1.pack(anchor=tk.W)
+
 execute_button_1 = tk.Button(
     frame1,
     text="実行",
     command=lambda: execute_command(1),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_1.pack(side=tk.LEFT)
 text_label1 = tk.Label(
@@ -334,16 +340,18 @@ text_label1.pack(side=tk.LEFT)
 # ボタン2
 frame2 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame2.pack(anchor=tk.W)
+
 execute_button_2 = tk.Button(
-    frame2,
+    frame1,
     text="実行",
     command=lambda: execute_command(2),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_2.pack(side=tk.LEFT)
 text_label2 = tk.Label(
-    frame2, text="音声ダウンロード", font=("Arial", 12), anchor=tk.W, bg="gray100"
+    frame1, text="音声ダウンロード", font=("Arial", 12), anchor=tk.W, bg="gray100"
 )
 text_label2.pack(side=tk.LEFT)
 
@@ -351,16 +359,32 @@ text_label2.pack(side=tk.LEFT)
 # ボタン3
 frame3 = tk.Frame(button_frame, padx=5, pady=5, bg="gray100")
 frame3.pack(anchor=tk.W)
+
 execute_button_3 = tk.Button(
-    frame3,
+    frame1,
     text="実行",
     command=lambda: execute_command(3),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_3.pack(side=tk.LEFT)
-text_label3 = tk.Label(frame3, text="高品質ダウンロード", font=("Arial", 12), bg="gray100")
+text_label3 = tk.Label(frame1, text="高品質ダウンロード", font=("Arial", 12), bg="gray100")
 text_label3.pack(side=tk.LEFT)
+
+
+# サムネdl
+execute_command_13 = tk.Button(
+    frame1,
+    text="実行",
+    command=lambda: execute_command(13),
+    font=("Arial", 12),
+    bg="gray100",
+    padx=10,
+)
+execute_command_13.pack(side=tk.LEFT)
+text_label13 = tk.Label(frame1, text="サムネイルをダウンロード", font=("Arial", 12), bg="gray100")
+text_label13.pack(side=tk.LEFT)
 
 
 # ボタン4
@@ -372,6 +396,7 @@ execute_button_4 = tk.Button(
     command=lambda: execute_command(4),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_4.pack(side=tk.LEFT)
 text_label4 = tk.Label(
@@ -389,6 +414,7 @@ execute_button_5 = tk.Button(
     command=lambda: execute_command(5),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_5.pack(side=tk.LEFT)
 text_label5 = tk.Label(frame5, text="字幕のみダウンロード", font=("Arial", 12), bg="gray100")
@@ -404,6 +430,7 @@ execute_button_6 = tk.Button(
     command=lambda: execute_command(6),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_6.pack(side=tk.LEFT)
 text_label6 = tk.Label(frame6, text="リストを表示", font=("Arial", 12), bg="gray100")
@@ -419,6 +446,7 @@ execute_button_7 = tk.Button(
     command=lambda: execute_command(7),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_7.pack(side=tk.LEFT)
 text_label7 = tk.Label(
@@ -436,6 +464,7 @@ execute_button_8 = tk.Button(
     command=lambda: execute_command(8),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_8.pack(side=tk.LEFT)
 text_label8 = tk.Label(frame8, text="配信を録画", font=("Arial", 12), bg="gray100")
@@ -451,6 +480,7 @@ execute_button_9 = tk.Button(
     command=lambda: execute_command(9),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_9.pack(side=tk.LEFT)
 text_label9 = tk.Label(
@@ -468,6 +498,7 @@ execute_button_10 = tk.Button(
     command=lambda: execute_command(10),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_10.pack(side=tk.LEFT)
 text_label10 = tk.Label(
@@ -485,6 +516,7 @@ execute_button_11 = tk.Button(
     command=lambda: execute_command(11),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_11.pack(side=tk.LEFT)
 text_label11 = tk.Label(
@@ -501,6 +533,7 @@ execute_button_12 = tk.Button(
     command=lambda: execute_command(12),
     font=("Arial", 12),
     bg="gray100",
+    padx=10,
 )
 execute_button_12.pack(side=tk.LEFT)
 text_label12 = tk.Label(
