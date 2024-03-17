@@ -4,7 +4,7 @@ import threading
 import json
 import os
 
-VERSION = "ver 1.5.1"
+VERSION = "ver 1.5.3"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -13,6 +13,7 @@ BROWSER = data["BROWSER"]
 CWD = os.getcwd()
 stopSrc = False
 isRunning = False
+
 
 def run_command(command):
     global isRunning
@@ -88,7 +89,7 @@ def execute_command(kind):
         elif kind == 5:
             command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" --write-auto-sub --sub-lang {lang} --skip-download'
         elif kind == 6:
-            command = f'yt-dlp {url} --list-formats'
+            command = f"yt-dlp {url} --list-formats --skip-download"
         elif kind == 7:
             command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f {num} --no-mtime'
         elif kind == 8:
@@ -96,7 +97,7 @@ def execute_command(kind):
         elif kind == 9:
             command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f "bestaudio[ext=m4a]" --no-mtime --cookies-from-browser {BROWSER}'
         elif kind == 10:
-            command = f'yt-dlp {url} --list-formats --cookies-from-browser {BROWSER}'
+            command = f"yt-dlp {url} --list-formats --skip-download --cookies-from-browser {BROWSER}"
         elif kind == 11:
             command = f'yt-dlp {url} -o "{DIR}\\%(title)s.%(ext)s" -f {num} --no-mtime --cookies-from-browser {BROWSER}'
         elif kind == 12:
@@ -104,13 +105,21 @@ def execute_command(kind):
         elif kind == 13:
             command = f'yt-dlp {url} -o "{DIR}\\%(title)s_thumbnail.%(ext)s" --write-thumbnail --skip-download --no-mtime'
 
-
         # コマンド実行を非同期に行うためのスレッドを開始
         thread = threading.Thread(target=run_command, args=(command,))
         thread.start()
 
+
 def open_savedir():
     os.startfile(DIR)
+
+
+def delete_query():
+    url = url_text.get()
+    if "&si" in url:
+        url = url.split("&si")[0]
+        url_text.set(url)
+
 
 # GUIの設定
 root = tk.Tk()
@@ -132,7 +141,11 @@ title_frame = tk.Frame(
 )
 title_frame.pack(anchor=tk.N)
 title_label = tk.Label(
-    title_frame, text="yt-dlpコマンド実行GUI", font=("Arial", 22), anchor=tk.W, bg="LightBlue"
+    title_frame,
+    text="yt-dlpコマンド実行GUI",
+    font=("Arial", 22),
+    anchor=tk.W,
+    bg="LightBlue",
 )
 title_label.pack(side=tk.LEFT)
 
@@ -149,7 +162,11 @@ url_label = tk.Label(
     url_frame, text="URL", font=("Arial", 16), anchor=tk.W, bg="LightPink"
 )
 url_label.pack(side=tk.LEFT)
-url_entry = tk.Entry(url_frame, width=50, bg="White")
+
+url_text = tk.StringVar()
+url_text.trace_add("write", lambda *args: delete_query())
+
+url_entry = tk.Entry(url_frame, width=50, bg="White", textvariable=url_text)
 url_entry.pack(side=tk.LEFT)
 
 br = tk.Label(input_frame, text="\n", font=("Arial", 8), bg="gray100")
@@ -241,9 +258,7 @@ br = tk.Label(input_frame, text="\n", font=("Arial", 4), bg="gray100")
 br.pack()
 
 # notification欄
-notification_frame = tk.Frame(
-    input_frame, padx=5, pady=5, bg="gray100", bd=5
-)
+notification_frame = tk.Frame(input_frame, padx=5, pady=5, bg="gray100", bd=5)
 notification_frame.pack(anchor=tk.W)
 notification_label = tk.Label(
     notification_frame, text="", font=("Arial", 16), anchor=tk.W, bg="gray100"
@@ -259,7 +274,11 @@ save_dir_frame = tk.Frame(
 )
 save_dir_frame.pack(anchor=tk.W)
 save_dir_label = tk.Label(
-    save_dir_frame, text="保存ディレクトリ", font=("Arial", 8), anchor=tk.W, bg="moccasin"
+    save_dir_frame,
+    text="保存ディレクトリ",
+    font=("Arial", 8),
+    anchor=tk.W,
+    bg="moccasin",
 )
 save_dir_label.pack(side=tk.LEFT)
 
@@ -269,6 +288,7 @@ save_dir_entry.pack(side=tk.LEFT)
 # まず、jsonのDIRを読み込む
 save_dir_entry.insert(0, DIR)
 
+
 # もし変更されたら、jsonに書き込む
 def save_dir_changed(event):
     global DIR
@@ -276,6 +296,7 @@ def save_dir_changed(event):
     with open("config.json", "w") as json_file:
         json.dump(data, json_file, indent=4)
     DIR = data["DIR"]
+
 
 # 設定のセーブ
 save_dir_entry.bind("<Return>", save_dir_changed)
@@ -286,7 +307,11 @@ browser_frame = tk.Frame(
 )
 browser_frame.pack(anchor=tk.W)
 browser_label = tk.Label(
-    browser_frame, text="使用ブラウザ(Cookieの場合)(高度な設定)", font=("Arial", 8), anchor=tk.W, bg="LightSalmon"
+    browser_frame,
+    text="使用ブラウザ(Cookieの場合)(高度な設定)",
+    font=("Arial", 8),
+    anchor=tk.W,
+    bg="LightSalmon",
 )
 browser_label.pack(side=tk.LEFT)
 
@@ -296,6 +321,7 @@ browser_entry.pack(side=tk.LEFT)
 # まず、jsonのBROWSERを読み込む
 browser_entry.insert(0, BROWSER)
 
+
 # もし変更されたら、jsonに書き込む
 def browser_changed(event):
     global BROWSER
@@ -304,12 +330,17 @@ def browser_changed(event):
         json.dump(data, json_file, indent=4)
     BROWSER = data["BROWSER"]
 
+
 # 設定のセーブ
 browser_entry.bind("<Return>", browser_changed)
 
 # 変更したらエンターキーを押してください、という文字を表示
 changed_label = tk.Label(
-    input_frame, text="変更したらエンターキーを押してください", font=("Arial", 12), anchor=tk.W, bg="gray100"
+    input_frame,
+    text="変更したらエンターキーを押してください",
+    font=("Arial", 12),
+    anchor=tk.W,
+    bg="gray100",
 )
 changed_label.pack(side=tk.LEFT)
 
@@ -369,7 +400,9 @@ execute_button_3 = tk.Button(
     padx=10,
 )
 execute_button_3.pack(side=tk.LEFT)
-text_label3 = tk.Label(frame1, text="高品質ダウンロード", font=("Arial", 12), bg="gray100")
+text_label3 = tk.Label(
+    frame1, text="高品質ダウンロード", font=("Arial", 12), bg="gray100"
+)
 text_label3.pack(side=tk.LEFT)
 
 
@@ -383,7 +416,9 @@ execute_command_13 = tk.Button(
     padx=10,
 )
 execute_command_13.pack(side=tk.LEFT)
-text_label13 = tk.Label(frame1, text="サムネイルをダウンロード", font=("Arial", 12), bg="gray100")
+text_label13 = tk.Label(
+    frame1, text="サムネイルをダウンロード", font=("Arial", 12), bg="gray100"
+)
 text_label13.pack(side=tk.LEFT)
 
 
@@ -400,7 +435,10 @@ execute_button_4 = tk.Button(
 )
 execute_button_4.pack(side=tk.LEFT)
 text_label4 = tk.Label(
-    frame4, text="フォーマットが非対応の場合(自動でフォーマットが選ばれます)", font=("Arial", 12), bg="gray100"
+    frame4,
+    text="フォーマットが非対応の場合(自動でフォーマットが選ばれます)",
+    font=("Arial", 12),
+    bg="gray100",
 )
 text_label4.pack(side=tk.LEFT)
 
@@ -417,7 +455,9 @@ execute_button_5 = tk.Button(
     padx=10,
 )
 execute_button_5.pack(side=tk.LEFT)
-text_label5 = tk.Label(frame5, text="字幕のみダウンロード", font=("Arial", 12), bg="gray100")
+text_label5 = tk.Label(
+    frame5, text="字幕のみダウンロード", font=("Arial", 12), bg="gray100"
+)
 text_label5.pack(side=tk.LEFT)
 
 
@@ -502,7 +542,10 @@ execute_button_10 = tk.Button(
 )
 execute_button_10.pack(side=tk.LEFT)
 text_label10 = tk.Label(
-    frame10, text="プレミアムでリストを表示(要Premium)", font=("Arial", 12), bg="gray100"
+    frame10,
+    text="プレミアムでリストを表示(要Premium)",
+    font=("Arial", 12),
+    bg="gray100",
 )
 text_label10.pack(side=tk.LEFT)
 
@@ -520,7 +563,10 @@ execute_button_11 = tk.Button(
 )
 execute_button_11.pack(side=tk.LEFT)
 text_label11 = tk.Label(
-    frame11, text="プレミアムでフォーマットを指定してダウンロード(要Premium)", font=("Arial", 12), bg="gray100"
+    frame11,
+    text="プレミアムでフォーマットを指定してダウンロード(要Premium)",
+    font=("Arial", 12),
+    bg="gray100",
 )
 text_label11.pack(side=tk.LEFT)
 
