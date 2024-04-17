@@ -11,6 +11,9 @@ Easy GUI for yt-dlp.
 # Installation/インストール
 あまり詳しくない場合はパッケージ版をおすすめします。
 
+※GUIの実行にはPythonが必要です。
+お好きな方法で導入してください。
+
 ・パッケージ版の導入方法
 
 1.[**ここ**](https://raw.githubusercontent.com/AkaakuHub/yt-dlp-GUI/main/yt-dlp-gui.zip)からzipファイルをダウンロードし、アプリケーションを配置したい場所で展開する。<br><br>
@@ -26,6 +29,7 @@ Easy GUI for yt-dlp.
 
 # How to use/使い方
 
+run.batを押して起動します。<br>
 初回使用の場合、まず保存ディレクトリを入力してEnterキーを押すことで登録してください。
 (設定は保存されます。)<br>
 
