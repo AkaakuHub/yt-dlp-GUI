@@ -16,24 +16,14 @@ jobs:
         with:
           path: src
 
-      - name: test1
-        run: ls src/dist
-          
-      - name: Unzip gui.zip
-        run: mkdir temp && mv src/dist/windows/gui.exe temp/gui.exe
-        # run: unzip src/dist/windows/gui.zip -d temp
-
-      # - name: Create config.json
-      #   run: |
-      #     echo '{
-      #       "DIR": "C:\\Users\\user\\Videos",
-      #       "BROWSER": "firefox"
-      #     }' > temp/config.json
-          
       - name: Zip files
-        run: zip -r result/gui.zip temp/gui.exe temp/config.json
+        run: zip -r gui.zip src/dist/windows/gui.exe src/config.json
         
-      - uses: actions/upload-artifact@v2
-        with:
-          name: gui
-          path: result
+      # 以下、ファイルのコミットとプッシュ
+      - name: Commit and Push
+        run: |
+          git config --global user.email "105225777+github-actions@users.noreply.github.com"
+          git config --global user.name "AkaakuHub"
+          git add gui.zip
+          git commit -m "Auto commit by GitHub Actions" || exit 0 # ignore error
+          git push
