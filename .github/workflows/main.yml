@@ -19,4 +19,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: gui
-          path: dist/win
+          path: src/dist/windows
