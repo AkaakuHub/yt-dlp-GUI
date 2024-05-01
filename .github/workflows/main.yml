@@ -15,8 +15,21 @@ jobs:
         uses: JackMcKew/pyinstaller-action-windows@main
         with:
           path: src
+          
+      - name: Unzip gui.zip
+        run: unzip src/dist/windows/gui.zip -d temp
 
+      - name: Create config.json
+        run: |
+          echo '{
+            "DIR": "C:\\Users\\user\\Videos",
+            "BROWSER": "firefox"
+          }' > temp/config.json
+          
+      - name: Zip files
+        run: zip -r result/gui.zip temp/gui.exe temp/config.json
+        
       - uses: actions/upload-artifact@v2
         with:
           name: gui
-          path: src/dist/windows
+          path: result
