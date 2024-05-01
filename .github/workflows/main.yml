@@ -15,6 +15,12 @@ jobs:
         uses: JackMcKew/pyinstaller-action-windows@main
         with:
           path: src
+          
+      - name: Delete old zip
+        run: |
+          if [[ -f yt-dlp-gui.zip ]]; then
+            rm yt-dlp-gui.zip
+          fi
 
       - name: Zip files
         run: zip -r yt-dlp-gui.zip src/dist/windows/gui.exe src/config.json
