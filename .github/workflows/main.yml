@@ -17,13 +17,13 @@ jobs:
           path: src
 
       - name: Zip files
-        run: zip -r gui.zip src/dist/windows/gui.exe src/config.json
+        run: zip -r yt-dlp-gui.zip src/dist/windows/gui.exe src/config.json
         
       # 以下、ファイルのコミットとプッシュ
       - name: Commit and Push
         run: |
           git config --global user.email "105225777+github-actions@users.noreply.github.com"
           git config --global user.name "AkaakuHub"
-          git add gui.zip
+          git add yt-dlp-gui.zip
           git commit -m "Auto commit by GitHub Actions" || exit 0 # ignore error
           git push
