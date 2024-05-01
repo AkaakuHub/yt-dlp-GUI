@@ -17,18 +17,18 @@ jobs:
           path: src
 
       - name: test1
-        run: ls src
+        run: ls src/dist
           
       - name: Unzip gui.zip
-        run: mv src/dist/windows/gui.exe temp/gui.exe
+        run: mkdir temp && mv src/dist/windows/gui.exe temp/gui.exe
         # run: unzip src/dist/windows/gui.zip -d temp
 
-      - name: Create config.json
-        run: |
-          echo '{
-            "DIR": "C:\\Users\\user\\Videos",
-            "BROWSER": "firefox"
-          }' > temp/config.json
+      # - name: Create config.json
+      #   run: |
+      #     echo '{
+      #       "DIR": "C:\\Users\\user\\Videos",
+      #       "BROWSER": "firefox"
+      #     }' > temp/config.json
           
       - name: Zip files
         run: zip -r result/gui.zip temp/gui.exe temp/config.json
