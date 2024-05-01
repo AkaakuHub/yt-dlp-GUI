@@ -22,8 +22,11 @@ jobs:
             rm yt-dlp-gui.zip
           fi
 
+      - name: Move files
+        run: mkdir yt-dlp-gui && mv src/dist/windows/gui.exe yt-dlp-gui/gui.exe && mv src/config.json yt-dlp-gui/config.json
+
       - name: Zip files
-        run: zip -r yt-dlp-gui.zip src/dist/windows/gui.exe src/config.json
+        run: zip -r yt-dlp-gui.zip yt-dlp-gui/gui.exe yt-dlp-gui/config.json
         
       # 以下、ファイルのコミットとプッシュ
       - name: Commit and Push
