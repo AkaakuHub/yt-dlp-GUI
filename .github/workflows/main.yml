@@ -17,10 +17,10 @@ jobs:
           path: src
 
       - name: test1
-        run: ls
+        run: ls　./src/
           
       - name: Unzip gui.zip
-        run: mv src/dist/windows/gui.exe -d temp/gui.exe
+        run: mv src/dist/windows/gui.exe temp/gui.exe
         # run: unzip src/dist/windows/gui.zip -d temp
 
       - name: Create config.json
