@@ -15,9 +15,13 @@ jobs:
         uses: JackMcKew/pyinstaller-action-windows@main
         with:
           path: src
+
+      - name: test1
+        run: ls
           
       - name: Unzip gui.zip
-        run: unzip src/dist/windows/gui.zip -d temp
+        run: mv src/dist/windows/gui.exe -d temp/gui.exe
+        # run: unzip src/dist/windows/gui.zip -d temp
 
       - name: Create config.json
         run: |
