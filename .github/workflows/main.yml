@@ -17,7 +17,7 @@ jobs:
           path: src
 
       - name: test1
-        run: ls　./src/
+        run: ls src
           
       - name: Unzip gui.zip
         run: mv src/dist/windows/gui.exe temp/gui.exe
