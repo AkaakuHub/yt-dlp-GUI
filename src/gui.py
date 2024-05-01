@@ -4,7 +4,7 @@ import threading
 import json
 import os
 
-VERSION = "ver 1.5.3"
+VERSION = "ver 1.5.4"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -118,7 +118,9 @@ def delete_query():
     url = url_text.get()
     if "&si" in url:
         url = url.split("&si")[0]
-        url_text.set(url)
+    elif "?si" in url:
+        url = url.split("?si")[0]
+    url_text.set(url)
 
 
 # GUIの設定
