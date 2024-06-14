@@ -3,8 +3,9 @@ import subprocess
 import threading
 import json
 import os
+import re
 
-VERSION = "ver 1.5.4"
+VERSION = "ver 1.6"
 
 with open("config.json", "r") as json_file:
     data = json.load(json_file)
@@ -13,6 +14,13 @@ BROWSER = data["BROWSER"]
 CWD = os.getcwd()
 stopSrc = False
 isRunning = False
+
+# もし、DIRが!notSet!ならば、デフォルトで、そのユーザーのVideosフォルダに設定する。
+if DIR == "!notSet!":
+    DIR = os.path.join(os.path.expanduser("~"), "Videos")
+    data["DIR"] = DIR
+    with open("config.json", "w") as json_file:
+        json.dump(data, json_file, indent=4)
 
 
 def run_command(command):
@@ -116,10 +124,11 @@ def open_savedir():
 
 def delete_query():
     url = url_text.get()
-    if "&si" in url:
-        url = url.split("&si")[0]
-    elif "?si" in url:
-        url = url.split("?si")[0]
+    # 正規表現パターンを定義
+    pattern = r"([&?](si|list|ab_channle)[^&]*)"
+
+    url = re.sub(pattern, "", url)
+    url = re.sub(r"[&?]$", "", url)
     url_text.set(url)
 
 
