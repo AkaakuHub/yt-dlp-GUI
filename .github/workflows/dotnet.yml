@@ -5,7 +5,11 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
- 
+env:
+  App_Name: yt-dlp-GUI
+  Solution_Path: WpfReleaseActionDemo.sln
+  App_Project_Path: src/WpfDemo.App/WpfDemo.App.csproj
+
 jobs:
   build:
  
@@ -38,30 +42,93 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
 
-    # tagのバージョン（例：「2.0」）に基づいて、リリースを作成します。
+      # tagのバージョン（例：「2.0」）に基づいて、リリースを作成します。
+  create-release:
+      runs-on: windows-latest
+      timeout-minutes: 15
+      needs: [build]
+      if: "contains( github.ref , 'tags/v')"
 
-    # まず、コミットされたもののtagを取得します。
-    - name: Get Tag
-      id: get_tag
-      run: echo ::set-output name=tag::$(git describe --tags --abbrev=0)
+      steps:
+        - name: Get version
+          shell: bash
+          run: |
+            echo "ver=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
 
-    # つぎに、そのタグを使ってリリースを作成します。
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        files: |
-          yt-dlp-GUI/bin/${{ matrix.configuration }}/yt-dlp-GUI.exe
-          yt-dlp-GUI/bin/${{ matrix.configuration }}/yt-dlp-GUI.exe.config
-        tag_name: ${{ steps.get_tag.outputs.tag }}
-        release_name: Release ${{ steps.get_tag.outputs.tag }}
-        body: |
-          Changes in this Release
-        draft: false
-        prerelease: false
+        - name: Set env
+          shell: bash
+          run: |
+            echo "version=${{ env.ver }}" >> $GITHUB_ENV          # exeに反映されます
+            # echo "fileversion=${{ env.ver }}" >> $GITHUB_ENV    # 未設定だとVersionに連動します
+            echo "app_x64_framework_name=${{ env.App_Name }}_win-x64_framework-dependent_ver${{ env.ver }}" >> $GITHUB_ENV
+            echo "app_x64_self_name=${{ env.App_Name }}_win-x64_self-contained_ver${{ env.ver }}" >> $GITHUB_ENV
 
-    # 最後に、リリースのURLを表示します。
-    - name: Get Release URL
-      run: echo "The release is at ${{ steps.create_release.outputs.upload_url }}"
+        # Checks-out repository under $GITHUB_WORKSPACE: https://github.com/actions/checkout
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+
+        # don't output pdb -> /p:DebugType=None /p:DebugSymbols=false
+        - name: dotnet publish x64 Framework-dependent
+          run: >
+            dotnet publish ${{ env.App_Project_Path }}
+            -c Release
+            -r win-x64
+            --self-contained false -p:UseAppHost=true
+            -p:PublishSingleFile=true
+            -p:PublishReadyToRun=false
+            -p:PublishTrimmed=false
+            -p:IncludeNativeLibrariesForSelfExtract=true
+            -o outputs\${{ env.app_x64_framework_name }}
+            /p:DebugType=None /p:DebugSymbols=false
+
+        # don't output pdb -> /p:DebugType=None /p:DebugSymbols=false
+        - name: dotnet publish x64 Self-contained
+          run: >
+            dotnet publish ${{ env.App_Project_Path }}
+            -c Release
+            -r win-x64
+            --self-contained true
+            -p:PublishSingleFile=true
+            -p:PublishReadyToRun=false
+            -p:PublishTrimmed=false
+            -p:IncludeNativeLibrariesForSelfExtract=true
+            -o outputs\${{ env.app_x64_self_name }}
+            /p:DebugType=None /p:DebugSymbols=false
+
+        # Upload Actions Artifacts: https://github.com/actions/upload-artifact
+        - name: Archive publish files
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ env.App_Name }}
+            path: outputs
+
+        # Create zip
+        - name: Create zip archive
+          shell: pwsh
+          run: |
+            Compress-Archive -Path outputs\${{ env.app_x64_framework_name }} -DestinationPath ${{ env.app_x64_framework_name }}.zip
+            Compress-Archive -Path outputs\${{ env.app_x64_self_name }} -DestinationPath ${{ env.app_x64_self_name }}.zip
+
+        # Create release page: https://github.com/ncipollo/release-action
+        - name: Create release
+          id: create_release
+          uses: ncipollo/release-action@v1
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            tag: v${{ env.ver }}
+            name: Ver ${{ env.ver }}
+            body: |
+              - Change design
+              - Bug fix
+            draft: true
+            prerelease: false
+            artifacts: "${{ env.app_x64_framework_name }}.zip, ${{ env.app_x64_self_name }}.zip"
+
+        # Remove artifacts to save space: https://github.com/c-hive/gha-remove-artifacts
+        - name: Remove old artifacts
+          uses: c-hive/gha-remove-artifacts@v1
+          with:
+            age: '1 weeks'
+            skip-recent: 2
