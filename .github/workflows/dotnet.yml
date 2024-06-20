@@ -1,53 +1,55 @@
-name: CI
-
+name: Build App
+ 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+ 
 jobs:
   build:
+ 
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+ 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-                             
-    env:
-      Solution_Name: yt-dlp-GUI.sln       # Replace with your solution name, i.e. MyWpfApp.sln.
-      # Test_Dll_Path: SampleTests\bin\Debug\SampleTests.dll
-
+ 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4.1.1
       with:
         fetch-depth: 0
-
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.3.1
-
-    # Setup NuGet
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v1.2.0
-
-    # Restore NuGet
-    - name: Restore NuGet packages
-      run: nuget restore $env:Solution_Name
-
-    - name: Build the Solution (Release configuration)
-      run: msbuild $env:Solution_Name /p:Configuration=Release
-
-    # Commit and Push
-    - name: Commit and Push
-      run: |
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "bot"
-        git add .
-        git commit -m "Auto commit by GitHub Actions" || exit 0 # ignore error
-        git push
-    # # Setup VSTest
-    # - name: Setup VSTest
-    #   uses: darenm/Setup-VSTest@v1.2
-
-    # # VSTest
-    # - name: Run VSTest
-    #   run: vstest.console.exe $env:Test_Dll_Path
+ 
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v2
+      
+    - name: Setup NuGet.exe for use with actions
+      # You may pin to the exact commit or the version.
+      # uses: NuGet/setup-nuget@a21f25cd3998bf370fde17e3f1b4c12c175172f9
+      uses: NuGet/setup-nuget@v2.0.0
+      
+    - name: Restore NuGet Packages
+      run: nuget restore yt-dlp-GUI.sln
+      
+    - name: Build App
+      run: msbuild yt-dlp-GUI.sln /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
+ 
+    - name: Upload GitHub Pages artifact
+      uses: actions/upload-pages-artifact@v3.0.1
+      with:
+        # Artifact name
+        name: yt-dlp-GUI_${{ matrix.configuration }}
+        # Path of the directory containing the static assets.
+        path: yt-dlp-GUI\bin\${{ matrix.configuration }}
+ 
+    # - name: Upload GitHub Pages artifact
+    #   uses: actions/upload-pages-artifact@v3.0.1
+    #   with:
+    #     # Artifact name
+    #     name: yt-dlp-GUI_${{ matrix.configuration }}
+    #     # Path of the directory containing the static assets.
+    #     path: yt-dlp-GUI\bin\${{ matrix.configuration }}
