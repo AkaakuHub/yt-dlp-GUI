@@ -4,3 +4,5 @@ packages
 
 ./yt-dlp-GUI/bin
 ./yt-dlp-GUI/obj
+
+*.bat
