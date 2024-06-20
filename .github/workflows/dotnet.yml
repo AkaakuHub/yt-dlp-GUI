@@ -5,15 +5,15 @@ on:
 
 env:
   App_Name: yt-dlp-GUI
-  Solution_Path: WpfReleaseActionDemo.sln
-  App_Project_Path: src/WpfDemo.App/WpfDemo.App.csproj
+  Solution_Path: yt-dlp-GUI.sln
+  App_Project_Path: yt-dlp-GUI\yt-dlp-GUI.csproj
 
 jobs:
   build:
  
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        configuration: [Release]
  
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
