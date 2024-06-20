@@ -80,7 +80,7 @@ jobs:
           - ${{ env.commit_message }}
         draft: true
         prerelease: false
-        artifacts: "${{ env.app_x64_framework_name }}.zip"
+        artifacts: "${{ env.App_Name }}.zip"
 
     # # Remove artifacts to save space: https://github.com/c-hive/gha-remove-artifacts
     # - name: Remove old artifacts
