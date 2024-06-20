@@ -436,7 +436,6 @@ namespace yt_dlp_GUI
             // ネットワーク接続の確認
             if (!NetworkInterface.GetIsNetworkAvailable())
             {
-                Console.WriteLine("ネットワーク接続がありません。");
                 return;
             }
 
@@ -445,18 +444,14 @@ namespace yt_dlp_GUI
             string latestVersion = GetLatestVersionFromGitHub(githubReleaseUrl);
 
             // プログラム内のバージョンと比較
-/*            if (string.Compare(version, latestVersion) < 0)
+            if (string.Compare(version, latestVersion) < 0)
             {
                 // 新しいバージョンのダウンロードと置き換え
                 DownloadAndReplaceExeFile();
-            }*/
-/*            else
-            {
-                Console.WriteLine("最新バージョンを使用しています。");
-            }*/
+            }
         }
 
-        static string GetLatestVersionFromGitHub(string url)
+        private string GetLatestVersionFromGitHub(string url)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             req.AllowAutoRedirect = true;
@@ -468,7 +463,7 @@ namespace yt_dlp_GUI
             return latestVersion;
         }
 
-        static void DownloadAndReplaceExeFile()
+        private void DownloadAndReplaceExeFile()
         {
 /*            // 新しいexeファイルをダウンロード
             string downloadUrl = "https://github.com/AkaakuHub/yt-dlp-GUI/releases/download/v1.2.3/your-app.exe";
