@@ -42,13 +42,12 @@ jobs:
         Configuration: ${{ matrix.configuration }}
 
     # Create release page: https://github.com/ncipollo/release-action
-    - name: Get version(if version tag)
-      
+    - name: Get version
       shell: bash
       run: |
         echo "ver=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
 
-    - name: Set env(if version tag)
+    - name: Set env
       # if : "contains( github.ref , 'tags/v')"
       shell: bash
       run: |
@@ -57,7 +56,14 @@ jobs:
         echo "app_x64_framework_name=${{ env.App_Name }}_win-x64_framework-dependent_ver${{ env.ver }}" >> $GITHUB_ENV
         echo "app_x64_self_name=${{ env.App_Name }}_win-x64_self-contained_ver${{ env.ver }}" >> $GITHUB_ENV
 
-    - name: Create release(if version tag)
+    - name: zipにまとめる
+    # .exeと、.exe.configをzipにまとめる
+      shell: pwsh
+      run: |
+        Compress-Archive -Path yt-dlp-GUI\bin\${{ matrix.configuration }}\${{ env.App_Name }}.exe -DestinationPath ${{ env.app_x64_framework_name }}.zip
+        Compress-Archive -Path yt-dlp-GUI\bin\${{ matrix.configuration }}\${{ env.App_Name }}.exe.config -DestinationPath ${{ env.app_x64_framework_name }}.zip
+
+    - name: Create release
       # if: "contains( github.ref , 'tags/v')"
       id: create_release
       uses: ncipollo/release-action@v1
@@ -70,7 +76,7 @@ jobs:
           - Bug fix
         draft: true
         prerelease: false
-        artifacts: yt-dlp-GUI\bin\${{ matrix.configuration }}
+        artifacts: "${{ env.app_x64_framework_name }}.zip"
 
     # # Remove artifacts to save space: https://github.com/c-hive/gha-remove-artifacts
     # - name: Remove old artifacts
