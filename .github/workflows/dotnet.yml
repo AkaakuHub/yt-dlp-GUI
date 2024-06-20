@@ -77,8 +77,8 @@ jobs:
         tag: v${{ env.ver }}
         name: Ver ${{ env.ver }}
         body: |
-          - ${{ env.commit_message }}
-        draft: true
+          ${{ env.commit_message }}
+        draft: false
         prerelease: false
         artifacts: "${{ env.App_Name }}.zip"
 
