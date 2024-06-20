@@ -37,19 +37,31 @@ jobs:
       run: msbuild yt-dlp-GUI.sln /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
- 
-    - name: Upload GitHub Pages artifact
-      uses: actions/upload-pages-artifact@v3.0.1
+
+    # tagのバージョン（例：「2.0」）に基づいて、リリースを作成します。
+
+    # まず、コミットされたもののtagを取得します。
+    - name: Get Tag
+      id: get_tag
+      run: echo ::set-output name=tag::$(git describe --tags --abbrev=0)
+
+    # つぎに、そのタグを使ってリリースを作成します。
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        # Artifact name
-        name: yt-dlp-GUI_${{ matrix.configuration }}
-        # Path of the directory containing the static assets.
-        path: yt-dlp-GUI\bin\${{ matrix.configuration }}
- 
-    # - name: Upload GitHub Pages artifact
-    #   uses: actions/upload-pages-artifact@v3.0.1
-    #   with:
-    #     # Artifact name
-    #     name: yt-dlp-GUI_${{ matrix.configuration }}
-    #     # Path of the directory containing the static assets.
-    #     path: yt-dlp-GUI\bin\${{ matrix.configuration }}
+        files: |
+          yt-dlp-GUI/bin/${{ matrix.configuration }}/yt-dlp-GUI.exe
+          yt-dlp-GUI/bin/${{ matrix.configuration }}/yt-dlp-GUI.exe.config
+        tag_name: ${{ steps.get_tag.outputs.tag }}
+        release_name: Release ${{ steps.get_tag.outputs.tag }}
+        body: |
+          Changes in this Release
+        draft: false
+        prerelease: false
+
+    # 最後に、リリースのURLを表示します。
+    - name: Get Release URL
+      run: echo "The release is at ${{ steps.create_release.outputs.upload_url }}"
