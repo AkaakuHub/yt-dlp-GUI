@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.0.5";
+        private string version = "v2.0.6";
 
 
         private Process ytDlpProcess;
@@ -587,7 +587,6 @@ namespace yt_dlp_GUI
 $zipPath = ""latest-release.zip""
 $extractPath = ""extracted""
 $oldExePath = ""yt-dlp-GUI.exe""
-$oldConfigPath = ""yt-dlp-GUI.exe.config""
 # アップデート中と表示
 echo ""yt-dlp-GUIをアップデート中...""
 
@@ -601,7 +600,6 @@ Expand-Archive -Path $zipPath -DestinationPath $extractPath
 
 # 新しいファイルのパス
 $newExePath = Join-Path $extractPath ""yt-dlp-GUI.exe""
-$newConfigPath = Join-Path $extractPath ""yt-dlp-GUI.exe.config""
 # 古いexeファイルを終了, PIDを参照してキル
 Get-Process -Id {myPID} | Stop-Process -Force
 # 一時停止
@@ -611,7 +609,6 @@ Start-Sleep -Seconds 1
 # もともとのexeがあるので、先に削除
 Remove-Item -Path $oldExePath -Force
 Move-Item -Path $newExePath -Destination $oldExePath -Force
-Move-Item -Path $newConfigPath -Destination $oldConfigPath -Force
 
 # クリーンアップ
 Remove-Item -Path $zipPath
