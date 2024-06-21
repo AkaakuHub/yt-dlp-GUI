@@ -31,7 +31,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "2.0";
+        private string version = "2.0.0";
 
 
         private Process ytDlpProcess;
