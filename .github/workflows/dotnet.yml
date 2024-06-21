@@ -74,7 +74,7 @@ jobs:
               with:
                   token: ${{ secrets.ACTIONS_TOKEN }}
                   tag: v${{ env.ver }}
-                  name: Ver ${{ env.ver }}
+                  name: v${{ env.ver }}
                   body: |
                       ${{ env.commit_message }}
                   draft: false

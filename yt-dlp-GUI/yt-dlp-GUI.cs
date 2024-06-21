@@ -31,7 +31,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "2.0.0";
+        private string version = "v2.0.1";
 
 
         private Process ytDlpProcess;
@@ -338,7 +338,7 @@ namespace yt_dlp_GUI
 
         private void バージョンToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string message = $"yt-dlp-GUI version {version}\n";
+            string message = $"yt-dlp-GUI {version}\n";
             if (isNetWorkAvailable)
             {
                 if (isLatestVersion)
