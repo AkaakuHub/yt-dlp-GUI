@@ -45,6 +45,9 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.5.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.5\lib\net472\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=4.0.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.4.1.0\lib\net462\nunit.framework.dll</HintPath>
     </Reference>
@@ -76,6 +79,12 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UpdateConfirmForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpdateConfirmForm.Designer.cs">
+      <DependentUpon>UpdateConfirmForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="yt-dlp-GUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -90,6 +99,9 @@
     <Compile Include="SettingForm.Designer.cs">
       <DependentUpon>SettingForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="UpdateConfirmForm.resx">
+      <DependentUpon>UpdateConfirmForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="yt-dlp-GUI.resx">
       <DependentUpon>yt-dlp-GUI.cs</DependentUpon>
     </EmbeddedResource>

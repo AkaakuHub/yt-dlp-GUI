@@ -4,13 +4,14 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Net;
+using Newtonsoft.Json.Linq;
+
 
 using System.Configuration;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -21,13 +22,16 @@ using System.Net.NetworkInformation;
 ・プロセスキルがうまくいかない
 ・スクロールが毎回上にいってしまう
 https://www.ipentec.com/document/csharp-detect-scroll-in-control
+
+
+・パスが通ってるかどうか
  */
 
 namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "1.5";
+        private string version = "2.0";
 
 
         private Process ytDlpProcess;
@@ -35,15 +39,27 @@ namespace yt_dlp_GUI
         private Task processTask;
         private CancellationTokenSource cancellationTokenSource;
 
-        private bool isRunning = false; // 追加：実行中かどうかを表す変数
-        private bool isScrollenable = true; // 追加：スクロール可能かどうかを表す変数
+        private bool isRunning = false;
+        private bool isScrollenable = true;
 
         private string codecID = "";
         private string subtitleLang = "";
 
+        private bool isLatestVersion = false;
+        private bool isNetWorkAvailable = false;
+
         private int prevOutputLength = 0;
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+        // 特定のURLを開く
+        async void OpenUrl(string url)
+        {
+            await Task.Run(() =>
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            });
+        }
 
         public Form1()
         {
@@ -56,8 +72,49 @@ namespace yt_dlp_GUI
                 config.Save();
             }
 
+            // update_script.ps1が同じディレクトリにあれば、削除
+            if (File.Exists("update_script.ps1"))
+            {
+                File.Delete("update_script.ps1");
+                MessageBox.Show("yt-dlp-GUIのアップデートが完了しました。");
+            }
+
+            // バージョンの取得とアップデートの確認
             versionUpdater();
+
+            // yt-dlpのパスが通っているか確認
+            isYtDlpAvailabeAsync();
         }
+
+        private void isYtDlpAvailabeAsync()
+        {
+            async void isYtDlpAvailabe()
+            {
+                await Task.Run(() =>
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/c yt-dlp --version")
+                    {
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    Process p = Process.Start(psi);
+                    p.WaitForExit();
+
+                    if (p.ExitCode != 0)
+                    {
+                        MessageBox.Show("yt-dlpがインストールされていないか、パスが通っていません。表示される手順に従ってパスを通してください。");
+                        OpenUrl("https://github.com/AkaakuHub/yt-dlp-GUI/new/main?filename=README.md#yt-dlp%E3%81%8C%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E3%81%95%E3%82%8C%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84%E3%81%8B%E3%83%91%E3%82%B9%E3%81%8C%E9%80%9A%E3%81%A3%E3%81%A6%E3%81%84%E3%81%BE%E3%81%9B%E3%82%93%E8%A1%A8%E7%A4%BA%E3%81%95%E3%82%8C%E3%82%8B%E6%89%8B%E9%A0%86%E3%81%AB%E5%BE%93%E3%81%A3%E3%81%A6%E3%83%91%E3%82%B9%E3%82%92%E9%80%9A%E3%81%97%E3%81%A6%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84%E3%81%A8%E8%A1%A8%E7%A4%BA%E3%81%95%E3%82%8C%E3%82%8B");
+                        Application.Exit();
+                    }
+                });
+            }
+
+            isYtDlpAvailabe();
+        }
+
+
 
         private string DeleteQuery(string url)
         {
@@ -217,7 +274,7 @@ namespace yt_dlp_GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            this.ActiveControl = URLInput;
         }
 
         private void stopButton_Click(object sender, EventArgs e)
@@ -276,16 +333,24 @@ namespace yt_dlp_GUI
 
         private void このアプリケーションについてToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // 特定のURLを開く
-            async void OpenUrl(string url)
-            {
-                await Task.Run(() =>
-                {
-                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-                });
-            }
-
             OpenUrl("https://github.com/AkaakuHub/yt-dlp-GUI");
+        }
+
+        private void バージョンToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string message = $"yt-dlp-GUI version {version}\n";
+            if (isNetWorkAvailable)
+            {
+                if (isLatestVersion)
+                {
+                    message += "最新バージョンです。";
+                }
+                else
+                {
+                    message += "新しいバージョンがあります。";
+                }
+            }
+            MessageBox.Show(message);
         }
 
         private void OpenSaveDIRButton_Click(object sender, EventArgs e)
@@ -439,6 +504,8 @@ namespace yt_dlp_GUI
                 return;
             }
 
+            isNetWorkAvailable = true;
+
             // GitHubのリリースからバージョンを取得
             string githubReleaseUrl = "https://github.com/AkaakuHub/yt-dlp-GUI/releases/latest";
             string latestVersion = GetLatestVersionFromGitHub(githubReleaseUrl);
@@ -446,8 +513,19 @@ namespace yt_dlp_GUI
             // プログラム内のバージョンと比較
             if (string.Compare(version, latestVersion) < 0)
             {
-                // 新しいバージョンのダウンロードと置き換え
-                DownloadAndReplaceExeFile();
+                // 新しいバージョンにするかどうかを確認
+                UpdateConfirmForm updateConfirmForm = new UpdateConfirmForm(version, latestVersion);
+                updateConfirmForm.StartPosition = FormStartPosition.CenterParent;
+                DialogResult result = updateConfirmForm.ShowDialog(this);
+
+                if (result == DialogResult.Yes)
+                {
+                    DownloadAndReplaceExeFile();
+                }
+            }
+            else if (string.Compare(version, latestVersion) == 0)
+            {
+                isLatestVersion = true;
             }
         }
 
@@ -465,19 +543,78 @@ namespace yt_dlp_GUI
 
         private void DownloadAndReplaceExeFile()
         {
-/*            // 新しいexeファイルをダウンロード
-            string downloadUrl = "https://github.com/AkaakuHub/yt-dlp-GUI/releases/download/v1.2.3/your-app.exe";
-            string newExePath = "new-app.exe"; // ダウンロードしたファイルの保存先
+            // GitHub API URL for the latest release
+            string apiUrl = "https://api.github.com/repos/AkaakuHub/yt-dlp-GUI/releases/latest";
 
+            // Set the User-Agent header to avoid 403 Forbidden response from GitHub API
             using (WebClient client = new WebClient())
             {
-                client.DownloadFile(downloadUrl, newExePath);
-            }
+                client.Headers.Add("User-Agent", "request");
 
-            // 古いexeファイルを置き換え
-            string oldExePath = "your-app.exe"; // 古いファイルのパス
-            File.Replace(newExePath, oldExePath, null);
-            Console.WriteLine("アップデートが完了しました。");*/
+                // Download the JSON response from the API
+                string json = client.DownloadString(apiUrl);
+
+                // Parse the JSON response to get the download URL of the latest ZIP file
+                JObject release = JObject.Parse(json);
+                string downloadUrl = release["assets"][0]["browser_download_url"].ToString();
+
+                // PowerShellスクリプトの内容を定義します。
+                string psScriptContent = $@"
+$zipPath = ""latest-release.zip""
+$extractPath = ""extracted""
+$oldExePath = ""yt-dlp-GUI.exe""
+$oldConfigPath = ""yt-dlp-GUI.exe.config""
+# アップデート中と表示
+echo ""yt-dlp-GUIをアップデート中...""
+
+# ダウンロード
+Invoke-WebRequest -Uri ""{downloadUrl}"" -OutFile $zipPath
+
+# 解凍
+if (Test-Path $extractPath) {{
+    Remove-Item -Recurse -Force $extractPath
+}}
+Expand-Archive -Path $zipPath -DestinationPath $extractPath
+
+# 新しいファイルのパス
+$newExePath = Join-Path $extractPath ""yt-dlp-GUI.exe""
+$newConfigPath = Join-Path $extractPath ""yt-dlp-GUI.exe.config""
+
+# 古いexeファイルを終了
+Get-Process -Name ""yt-dlp-GUI"" -ErrorAction SilentlyContinue | ForEach-Object {{ $_.CloseMainWindow(); $_.WaitForExit(); }}
+
+# 置き換え
+Move-Item -Path $newExePath -Destination $oldExePath -Force
+Move-Item -Path $newConfigPath -Destination $oldConfigPath -Force
+
+# クリーンアップ
+Remove-Item -Path $zipPath
+Remove-Item -Recurse -Force $extractPath
+
+# 新しいexeファイルを起動
+Start-Process -FilePath $oldExePath
+
+# 自分自身のps1ファイルを削除
+# Remove-Item -Path $MyInvocation.MyCommand.Path
+";
+
+                // PowerShellスクリプトをファイルに書き出します。
+                string psScriptPath = "update_script.ps1";
+                File.WriteAllText(psScriptPath, psScriptContent, System.Text.Encoding.UTF8);
+
+                // PowerShellスクリプトを実行します。
+                ProcessStartInfo processStartInfo = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",
+                    Arguments = $"-ExecutionPolicy Bypass -File {psScriptPath}",
+                    UseShellExecute = false,
+                    CreateNoWindow = false
+                };
+                Process process = new Process { StartInfo = processStartInfo };
+                // ps1を起動してからすぐ自分自身を終了
+                process.Start();
+                Application.Exit();
+            }
         }
     }
 }

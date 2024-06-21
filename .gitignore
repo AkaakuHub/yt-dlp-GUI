@@ -1,8 +1,9 @@
 packages
 
-.vs/*
+.vs
 
-./yt-dlp-GUI/bin
-./yt-dlp-GUI/obj
+yt-dlp-GUI/bin
+yt-dlp-GUI/obj
+yt-dlp-GUI/.vs
 
 *.bat

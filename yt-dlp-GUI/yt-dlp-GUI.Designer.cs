@@ -42,6 +42,7 @@
             this.cookie取得元ブラウザの指定ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExitApplicationMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.ヘルプToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.バージョンToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.このアプリケーションについてToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenSaveDIRButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -171,7 +172,7 @@
             this.保存先の指定ToolStripMenuItem,
             this.cookie取得元ブラウザの指定ToolStripMenuItem});
             this.環境設定.Name = "環境設定";
-            this.環境設定.Size = new System.Drawing.Size(122, 22);
+            this.環境設定.Size = new System.Drawing.Size(180, 22);
             this.環境設定.Text = "環境設定";
             // 
             // 保存先の指定ToolStripMenuItem
@@ -191,17 +192,25 @@
             // ExitApplicationMenu
             // 
             this.ExitApplicationMenu.Name = "ExitApplicationMenu";
-            this.ExitApplicationMenu.Size = new System.Drawing.Size(122, 22);
+            this.ExitApplicationMenu.Size = new System.Drawing.Size(180, 22);
             this.ExitApplicationMenu.Text = "終了";
             this.ExitApplicationMenu.Click += new System.EventHandler(this.ExitApplicationMenu_Click);
             // 
             // ヘルプToolStripMenuItem
             // 
             this.ヘルプToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.バージョンToolStripMenuItem,
             this.このアプリケーションについてToolStripMenuItem});
             this.ヘルプToolStripMenuItem.Name = "ヘルプToolStripMenuItem";
             this.ヘルプToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.ヘルプToolStripMenuItem.Text = "ヘルプ";
+            // 
+            // バージョンToolStripMenuItem
+            // 
+            this.バージョンToolStripMenuItem.Name = "バージョンToolStripMenuItem";
+            this.バージョンToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.バージョンToolStripMenuItem.Text = "バージョン";
+            this.バージョンToolStripMenuItem.Click += new System.EventHandler(this.バージョンToolStripMenuItem_Click);
             // 
             // このアプリケーションについてToolStripMenuItem
             // 
@@ -649,6 +658,7 @@
         private System.Windows.Forms.Label FuncLabelText12;
         private System.Windows.Forms.Label FuncLabelText13;
         private System.Windows.Forms.TextBox manualCodeInput;
+        private System.Windows.Forms.ToolStripMenuItem バージョンToolStripMenuItem;
     }
 }
 
