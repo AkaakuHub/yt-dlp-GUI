@@ -31,7 +31,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.0.2";
+        private string version = "v2.0.3beta";
 
 
         private Process ytDlpProcess;
@@ -547,6 +547,7 @@ namespace yt_dlp_GUI
 
         private void DownloadAndReplaceExeFile()
         {
+            MessageBox.Show("debug: yesButtonおされた");
             // GitHub API URL for the latest release
             string apiUrl = "https://api.github.com/repos/AkaakuHub/yt-dlp-GUI/releases/latest";
 
@@ -558,9 +559,13 @@ namespace yt_dlp_GUI
                 // Download the JSON response from the API
                 string json = client.DownloadString(apiUrl);
 
+                MessageBox.Show("debug: json取得完了");
+
                 // Parse the JSON response to get the download URL of the latest ZIP file
                 JObject release = JObject.Parse(json);
                 string downloadUrl = release["assets"][0]["browser_download_url"].ToString();
+
+                MessageBox.Show("debug:" + downloadUrl + "を取得した");
 
                 // PowerShellスクリプトの内容を定義します。
                 string psScriptContent = $@"
@@ -606,6 +611,8 @@ Start-Process -FilePath $oldExePath
                 string psScriptPath = "update_script.ps1";
                 File.WriteAllText(psScriptPath, psScriptContent, System.Text.Encoding.UTF8);
 
+                MessageBox.Show("debug: ps1ファイル作成完了");
+
                 // PowerShellスクリプトを実行します。
                 ProcessStartInfo processStartInfo = new ProcessStartInfo
                 {
@@ -616,6 +623,7 @@ Start-Process -FilePath $oldExePath
                 };
                 Process process = new Process { StartInfo = processStartInfo };
                 // ps1を起動してからすぐ自分自身を終了
+                MessageBox.Show("debug: ps1ファイル実行");
                 process.Start();
                 Application.Exit();
             }
