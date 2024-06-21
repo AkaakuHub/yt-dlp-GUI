@@ -22,16 +22,13 @@ using System.Net.NetworkInformation;
 ・プロセスキルがうまくいかない
 ・スクロールが毎回上にいってしまう
 https://www.ipentec.com/document/csharp-detect-scroll-in-control
-
-
-・パスが通ってるかどうか
  */
 
 namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.0.3beta";
+        private string version = "v2.0.3";
 
 
         private Process ytDlpProcess;
@@ -547,7 +544,6 @@ namespace yt_dlp_GUI
 
         private void DownloadAndReplaceExeFile()
         {
-            MessageBox.Show("debug: yesButtonおされた");
             // GitHub API URL for the latest release
             string apiUrl = "https://api.github.com/repos/AkaakuHub/yt-dlp-GUI/releases/latest";
 
@@ -559,13 +555,14 @@ namespace yt_dlp_GUI
                 // Download the JSON response from the API
                 string json = client.DownloadString(apiUrl);
 
-                MessageBox.Show("debug: json取得完了");
 
                 // Parse the JSON response to get the download URL of the latest ZIP file
                 JObject release = JObject.Parse(json);
                 string downloadUrl = release["assets"][0]["browser_download_url"].ToString();
 
-                MessageBox.Show("debug:" + downloadUrl + "を取得した");
+                // ここで、自分自身のexeのPIDを取得しておく
+                string myPID = Process.GetCurrentProcess().Id.ToString();
+
 
                 // PowerShellスクリプトの内容を定義します。
                 string psScriptContent = $@"
@@ -578,7 +575,6 @@ echo ""yt-dlp-GUIをアップデート中...""
 
 # ダウンロード
 Invoke-WebRequest -Uri ""{downloadUrl}"" -OutFile $zipPath
-
 # 解凍
 if (Test-Path $extractPath) {{
     Remove-Item -Recurse -Force $extractPath
@@ -588,11 +584,14 @@ Expand-Archive -Path $zipPath -DestinationPath $extractPath
 # 新しいファイルのパス
 $newExePath = Join-Path $extractPath ""yt-dlp-GUI.exe""
 $newConfigPath = Join-Path $extractPath ""yt-dlp-GUI.exe.config""
-
-# 古いexeファイルを終了
-Get-Process -Name ""yt-dlp-GUI"" -ErrorAction SilentlyContinue | ForEach-Object {{ $_.CloseMainWindow(); $_.WaitForExit(); }}
+# 古いexeファイルを終了, PIDを参照してキル
+Get-Process -Id {myPID} | Stop-Process -Force
+# 一時停止
+Start-Sleep -Seconds 1
 
 # 置き換え
+# もともとのexeがあるので、先に削除
+Remove-Item -Path $oldExePath -Force
 Move-Item -Path $newExePath -Destination $oldExePath -Force
 Move-Item -Path $newConfigPath -Destination $oldConfigPath -Force
 
@@ -602,16 +601,11 @@ Remove-Item -Recurse -Force $extractPath
 
 # 新しいexeファイルを起動
 Start-Process -FilePath $oldExePath
-
-# 自分自身のps1ファイルを削除
-# Remove-Item -Path $MyInvocation.MyCommand.Path
 ";
-
                 // PowerShellスクリプトをファイルに書き出します。
                 string psScriptPath = "update_script.ps1";
                 File.WriteAllText(psScriptPath, psScriptContent, System.Text.Encoding.UTF8);
 
-                MessageBox.Show("debug: ps1ファイル作成完了");
 
                 // PowerShellスクリプトを実行します。
                 ProcessStartInfo processStartInfo = new ProcessStartInfo
@@ -623,7 +617,6 @@ Start-Process -FilePath $oldExePath
                 };
                 Process process = new Process { StartInfo = processStartInfo };
                 // ps1を起動してからすぐ自分自身を終了
-                MessageBox.Show("debug: ps1ファイル実行");
                 process.Start();
                 Application.Exit();
             }
