@@ -18,7 +18,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Net.NetworkInformation;
 
 /*
- TODO: 
+TODO:
 ・プロセスキルがうまくいかない
 ・スクロールが毎回上にいってしまう
 https://www.ipentec.com/document/csharp-detect-scroll-in-control
@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.0.4";
+        private string version = "v2.0.5";
 
 
         private Process ytDlpProcess;
@@ -73,10 +73,8 @@ namespace yt_dlp_GUI
             if (File.Exists("update_script.ps1"))
             {
                 File.Delete("update_script.ps1");
-                this.Invoke((MethodInvoker)delegate
-                {
-                    MessageBox.Show("yt-dlp-GUIのアップデートが完了しました。");
-                });
+                MessageBox.Show("yt-dlp-GUIのアップデートが完了しました。");
+
             }
 
             // バージョンの取得とアップデートの確認
