@@ -45,7 +45,7 @@ namespace yt_dlp_GUI
         private bool isLatestVersion = false;
         private bool isNetWorkAvailable = false;
 
-        private int prevOutputLength = 0;
+        /*private int prevOutputLength = 0;*/
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 

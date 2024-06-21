@@ -42,11 +42,6 @@ jobs:
               env:
                   Configuration: ${{ matrix.configuration }}
 
-            - name: Check files
-              run: |
-                  ls yt-dlp-GUI\bin
-                  ls yt-dlp-GUI\bin\${{ matrix.configuration }}
-
             # Create release page: https://github.com/ncipollo/release-action
             - name: Get version
               shell: bash
