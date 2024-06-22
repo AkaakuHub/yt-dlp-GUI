@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.0.6";
+        private string version = "v2.0.7";
 
 
         private Process ytDlpProcess;
@@ -118,7 +118,16 @@ namespace yt_dlp_GUI
 
         private string DeleteQuery(string url)
         {
-            string pattern = @"([&?](si|list|ab_channle)[^&]*)";
+            // "playlist"という文字があったら、listの部分だけを残す
+            string pattern;
+            if (url.Contains("playlist"))
+            {
+                pattern = @"([&?](si|index|ab_channel)[^&]*)";
+            }
+            else
+            { 
+                pattern = @"([&?](si|list|index|ab_channel)[^&]*)";
+            }
             url = System.Text.RegularExpressions.Regex.Replace(url, pattern, "");
             url = System.Text.RegularExpressions.Regex.Replace(url, @"[&?]$", "");
             return url;
