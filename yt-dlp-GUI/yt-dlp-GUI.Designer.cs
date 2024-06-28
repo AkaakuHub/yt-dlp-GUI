@@ -172,7 +172,7 @@
             this.保存先の指定ToolStripMenuItem,
             this.cookie取得元ブラウザの指定ToolStripMenuItem});
             this.環境設定.Name = "環境設定";
-            this.環境設定.Size = new System.Drawing.Size(180, 22);
+            this.環境設定.Size = new System.Drawing.Size(122, 22);
             this.環境設定.Text = "環境設定";
             // 
             // 保存先の指定ToolStripMenuItem
@@ -192,7 +192,7 @@
             // ExitApplicationMenu
             // 
             this.ExitApplicationMenu.Name = "ExitApplicationMenu";
-            this.ExitApplicationMenu.Size = new System.Drawing.Size(180, 22);
+            this.ExitApplicationMenu.Size = new System.Drawing.Size(122, 22);
             this.ExitApplicationMenu.Text = "終了";
             this.ExitApplicationMenu.Click += new System.EventHandler(this.ExitApplicationMenu_Click);
             // 

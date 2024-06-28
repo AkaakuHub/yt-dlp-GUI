@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.0.8";
+        private string version = "v2.1.0";
 
 
         private Process ytDlpProcess;
@@ -78,7 +78,7 @@ namespace yt_dlp_GUI
             }
 
             // バージョンの取得とアップデートの確認
-            versionUpdater();
+            versionUpdaterAsync();
 
             // yt-dlp, ffmpegのパスが通っているか確認
             isProgramAvailabeAsync();
@@ -195,16 +195,16 @@ namespace yt_dlp_GUI
                     command = $"yt-dlp {url} -o \"{DIR}\\%(title)s.%(ext)s\" -f {codecID} --no-mtime";
                     break;
                 case 9:
-                    command = $"yt-dlp {url} -o \"{DIR}\\%(title)s.%(ext)s\" --live-from-start";
-                    break;
-                case 10:
-                    command = $"yt-dlp {url} -o \"{DIR}\\%(title)s.%(ext)s\" -f \"bestaudio[ext=m4a]\" --no-mtime --cookies-from-browser {BROWSER}";
-                    break;
-                case 11:
                     command = $"yt-dlp {url} --list-formats --skip-download --cookies-from-browser {BROWSER}";
                     break;
-                case 12:
+                case 10:
                     command = $"yt-dlp {url} -o \"{DIR}\\%(title)s.%(ext)s\" -f {codecID} --no-mtime --cookies-from-browser {BROWSER}";
+                    break;
+                case 11:
+                    command = $"yt-dlp {url} -o \"{DIR}\\%(title)s.%(ext)s\" -f \"141/bestaudio[ext=m4a]\" --no-mtime --cookies-from-browser {BROWSER}";
+                    break;
+                case 12:
+                    command = $"yt-dlp {url} -o \"{DIR}\\%(title)s.%(ext)s\" --live-from-start";
                     break;
                 case 13:
                     command = "yt-dlp " + manualCodeInput.Text;
@@ -534,41 +534,45 @@ namespace yt_dlp_GUI
                     }
                 }*/
 
-        private void versionUpdater()
+        private void versionUpdaterAsync()
         {
-            // ネットワーク接続の確認
-            if (!NetworkInterface.GetIsNetworkAvailable())
+            async void versionUpdater()
             {
-                return;
-            }
-
-
-            // GitHubのリリースからバージョンを取得
-            string githubReleaseUrl = "https://github.com/AkaakuHub/yt-dlp-GUI/releases/latest";
-            string latestVersion = GetLatestVersionFromGitHub(githubReleaseUrl);
-
-            // プログラム内のバージョンと異なったら,
-            if (string.Compare(version, latestVersion) != 0)
-            {
-                isNetWorkAvailable = true;
-                isLatestVersion = false;
-
-                // 新しいバージョンにするかどうかを確認
-                UpdateConfirmForm updateConfirmForm = new UpdateConfirmForm(version, latestVersion);
-                updateConfirmForm.StartPosition = FormStartPosition.CenterParent;
-                DialogResult result = updateConfirmForm.ShowDialog(this);
-
-                if (result == DialogResult.Yes)
+                // ネットワーク接続の確認
+                if (!NetworkInterface.GetIsNetworkAvailable())
                 {
-                    DownloadAndReplaceExeFile();
+                    return;
+                }
+
+
+                // GitHubのリリースからバージョンを取得
+                string githubReleaseUrl = "https://github.com/AkaakuHub/yt-dlp-GUI/releases/latest";
+                string latestVersion = GetLatestVersionFromGitHub(githubReleaseUrl);
+
+                // プログラム内のバージョンと異なったら,
+                if (string.Compare(version, latestVersion) != 0)
+                {
+                    isNetWorkAvailable = true;
+                    isLatestVersion = false;
+
+                    // 新しいバージョンにするかどうかを確認
+                    UpdateConfirmForm updateConfirmForm = new UpdateConfirmForm(version, latestVersion);
+                    updateConfirmForm.StartPosition = FormStartPosition.CenterParent;
+                    DialogResult result = updateConfirmForm.ShowDialog(this);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        DownloadAndReplaceExeFile();
+                    }
+                }
+                else
+                {
+                    isNetWorkAvailable = true;
+                    isLatestVersion = true;
                 }
             }
-            else
-            {
-                isNetWorkAvailable = true;
-                isLatestVersion = true;
-            }
 
+            versionUpdater();
         }
 
         private string GetLatestVersionFromGitHub(string url)
