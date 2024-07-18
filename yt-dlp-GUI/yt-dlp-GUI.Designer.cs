@@ -557,7 +557,8 @@
             // 
             // Form1
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.manualCodeInput);
             this.Controls.Add(this.FuncLabelText13);
