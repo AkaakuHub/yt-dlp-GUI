@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.1.1";
+        private string version = "v2.1.2";
 
 
         private Process ytDlpProcess;
@@ -136,11 +136,11 @@ namespace yt_dlp_GUI
             string pattern;
             if (url.Contains("playlist"))
             {
-                pattern = @"([&?](si|index|ab_channel)[^&]*)";
+                pattern = @"([&?](si|index|ab_channel|pp)[^&]*)";
             }
             else
             { 
-                pattern = @"([&?](si|list|index|ab_channel)[^&]*)";
+                pattern = @"([&?](si|list|index|ab_channel|pp)[^&]*)";
             }
             url = System.Text.RegularExpressions.Regex.Replace(url, pattern, "");
             url = System.Text.RegularExpressions.Regex.Replace(url, @"[&?]$", "");
