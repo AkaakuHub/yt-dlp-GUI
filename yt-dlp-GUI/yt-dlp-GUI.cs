@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.1.2";
+        private string version = "v2.2.0";
 
 
         private Process ytDlpProcess;
@@ -44,6 +44,10 @@ namespace yt_dlp_GUI
 
         private bool isLatestVersion = false;
         private bool isNetWorkAvailable = false;
+
+
+        // ----------, のindexは除外する
+        private int[] excludeIndex = { 6, 9, 12 };
 
         /*private int prevOutputLength = 0;*/
 
@@ -69,6 +73,15 @@ namespace yt_dlp_GUI
                 config.Save();
             }
 
+            // execDropDownの前回の選択位置を復元
+            if (config.AppSettings.Settings["execDropDownIndex"].Value == "!notSet!")
+            {
+                config.AppSettings.Settings["execDropDownIndex"].Value = "2";
+                config.Save();
+            }
+
+            //this.execDropDown.SelectedIndex = int.Parse(config.AppSettings.Settings["execDropDownIndex"].Value);
+
             // update_script.ps1が同じディレクトリにあれば、削除
             if (File.Exists("update_script.ps1"))
             {
@@ -82,6 +95,9 @@ namespace yt_dlp_GUI
 
             // yt-dlp, ffmpegのパスが通っているか確認
             isProgramAvailabeAsync();
+
+            execDropDown.SelectedIndex = int.Parse(config.AppSettings.Settings["execDropDownIndex"].Value);
+            execDropDown.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void isProgramAvailabeAsync()
@@ -147,14 +163,7 @@ namespace yt_dlp_GUI
             return url;
         }
 
-        private void URLInput_TextChanged(object sender, EventArgs e)
-        {
-            // 入力されたURLからクエリを削除
-            URLInput.Text = DeleteQuery(URLInput.Text);
-        }
-
-        private void YtDlpCommandWrapper(int kind) {
-            string url = URLInput.Text;
+        private void YtDlpCommandWrapper(int kind, string url) { 
             string DIR = config.AppSettings.Settings["DIR"].Value;
             string BROWSER = config.AppSettings.Settings["BROWSER"].Value;
 
@@ -165,6 +174,14 @@ namespace yt_dlp_GUI
                 this.Invoke((MethodInvoker)delegate
                 {
                     MessageBox.Show(this, "URLを入力してください。");
+                });
+                return;
+            }
+            else if (!url.StartsWith("http"))
+            { 
+                this.Invoke((MethodInvoker)delegate
+                {
+                    MessageBox.Show(this, $"URLの形式が正しくありません。\n{url}は有効なURLではありません。");
                 });
                 return;
             }
@@ -303,10 +320,10 @@ namespace yt_dlp_GUI
             }
         }
 
-
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.ActiveControl = URLInput;
+            // URL入力欄にフォーカスを当てる
+            // this.ActiveControl = URLInput;
         }
 
         private void stopButton_Click(object sender, EventArgs e)
@@ -421,74 +438,6 @@ namespace yt_dlp_GUI
             // trueなら白、falseならピンク
             stopScrollButton.BackColor = isScrollenable ? Color.White : Color.LightPink;
         }
-
-
-
-
-        private void execButton1_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(1);
-        }
-
-        private void execButton2_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(2);
-        }
-
-        private void execButton3_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(3);
-        }
-
-        private void execButton4_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(4);
-        }
-
-        private void execButton5_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(5);
-        }
-
-        private void execButton6_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(6);
-        }
-        private void execButton7_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(7);
-        }
-
-        private void execButton8_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(8);
-        }
-
-        private void execButton9_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(9);
-        }
-
-        private void execButton10_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(10);
-        }
-
-        private void execButton11_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(11);
-        }
-
-        private void execButton12_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(12);
-        }
-
-        private void execButton13_Click(object sender, EventArgs e)
-        {
-            YtDlpCommandWrapper(13);
-        }
-
 
         /*        private void scrollDetectTextBox1_Scroll(object sender, ScrollEventArgs e)
                 {
@@ -662,6 +611,82 @@ Start-Process -FilePath $oldExePath
                 process.Start();
                 Application.Exit();
             }
+        }
+
+        private void execDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            int selectedIndex = comboBox.SelectedIndex;
+
+            if (Array.Exists(excludeIndex, element => element == selectedIndex))
+            {
+                // 直前に選択していたインデックスに戻す
+                comboBox.SelectedIndex = int.Parse(config.AppSettings.Settings["execDropDownIndex"].Value);
+                return;
+            }
+            else
+            {
+                config.AppSettings.Settings["execDropDownIndex"].Value = selectedIndex.ToString();
+                config.Save();
+            }
+        }
+
+        private void triggerExecButton_Click(object sender, EventArgs e)
+        {
+            // クリップボードからテキストを取得
+            string clipboardText = Clipboard.GetText();
+
+            // クエリ除去
+            clipboardText = DeleteQuery(clipboardText);
+
+            // execDropDownの選択されている番号を取得
+            // 番号は、項目の先頭に「1.」のように書いているのを取得
+            string selectedText = execDropDown.SelectedItem.ToString();
+            int selectedKind = int.Parse(selectedText.Split('.')[0]);
+
+            // 選択されているインデックスによって、実行する関数を変更
+            YtDlpCommandWrapper(selectedKind, clipboardText);
+        }
+
+        private void execDropDownNext_Click(object sender, EventArgs e)
+        {
+            int currentIndex = execDropDown.SelectedIndex;
+            int nextIndex = currentIndex + 1;
+            if(Array.Exists(excludeIndex, element => element == nextIndex))
+            {
+                nextIndex++;
+            }
+            if(nextIndex >= execDropDown.Items.Count)
+            {
+                nextIndex = 0;
+            }
+            execDropDown.SelectedIndex = nextIndex;
+
+            config.AppSettings.Settings["execDropDownIndex"].Value = nextIndex.ToString();
+            config.Save();
+        }
+
+        private void execDropDownPrev_Click(object sender, EventArgs e)
+        {
+            int currentIndex = execDropDown.SelectedIndex;
+            int nextIndex = currentIndex - 1;
+            if (Array.Exists(excludeIndex, element => element == nextIndex))
+            {
+                nextIndex--;
+            }
+            if (nextIndex < 0)
+            {
+                nextIndex = execDropDown.Items.Count - 1;
+            }
+            execDropDown.SelectedIndex = nextIndex;
+
+            config.AppSettings.Settings["execDropDownIndex"].Value = nextIndex.ToString();
+            config.Save();
+        }
+
+        private void 終了ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
