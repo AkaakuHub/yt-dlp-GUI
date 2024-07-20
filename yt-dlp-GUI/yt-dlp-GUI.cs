@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.2.0";
+        private string version = "v2.2.1";
 
 
         private Process ytDlpProcess;
@@ -73,6 +73,14 @@ namespace yt_dlp_GUI
                 config.Save();
             }
 
+            // アップデートの設計ミスのため、
+            // もしconfigにexecDropDownIndexがなければ、作成
+            if (config.AppSettings.Settings["execDropDownIndex"] == null)
+            {
+                config.AppSettings.Settings.Add("execDropDownIndex", "2");
+                config.Save();
+            }
+
             // execDropDownの前回の選択位置を復元
             if (config.AppSettings.Settings["execDropDownIndex"].Value == "!notSet!")
             {
@@ -80,7 +88,6 @@ namespace yt_dlp_GUI
                 config.Save();
             }
 
-            //this.execDropDown.SelectedIndex = int.Parse(config.AppSettings.Settings["execDropDownIndex"].Value);
 
             // update_script.ps1が同じディレクトリにあれば、削除
             if (File.Exists("update_script.ps1"))
@@ -563,21 +570,51 @@ namespace yt_dlp_GUI
 $zipPath = ""latest-release.zip""
 $extractPath = ""extracted""
 $oldExePath = ""yt-dlp-GUI.exe""
+$oldConfigPath = ""yt-dlp-GUI.Config""
+$newConfigPath = Join-Path $extractPath ""yt-dlp-GUI.Config""
+$newConfigKeys = @()
+
 # アップデート中と表示
 echo ""yt-dlp-GUIをアップデート中...""
 
 # ダウンロード
 Invoke-WebRequest -Uri ""{downloadUrl}"" -OutFile $zipPath
+
 # 解凍
 if (Test-Path $extractPath) {{
     Remove-Item -Recurse -Force $extractPath
 }}
 Expand-Archive -Path $zipPath -DestinationPath $extractPath
 
+# 新しいconfigファイルのキーを列挙
+if (Test-Path $newConfigPath) {{
+    [xml]$newConfig = Get-Content $newConfigPath
+    foreach ($setting in $newConfig.configuration.appSettings.add) {{
+        $newConfigKeys += $setting.key
+    }}
+}}
+
+# 古いconfigファイルに存在しないキーを追加
+if (Test-Path $oldConfigPath) {{
+    [xml]$oldConfig = Get-Content $oldConfigPath
+    foreach ($key in $newConfigKeys) {{
+        $existingSetting = $oldConfig.configuration.appSettings.add | Where-Object {{ $_.key -eq $key }}
+        if (-not $existingSetting) {{
+            $newElement = $oldConfig.CreateElement(""add"")
+            $newElement.SetAttribute(""key"", $key)
+            $newElement.SetAttribute(""value"", ""!notSet!"")
+            $oldConfig.configuration.appSettings.AppendChild($newElement)
+        }}
+    }}
+    $oldConfig.Save($oldConfigPath)
+}}
+
 # 新しいファイルのパス
 $newExePath = Join-Path $extractPath ""yt-dlp-GUI.exe""
+
 # 古いexeファイルを終了, PIDを参照してキル
 Get-Process -Id {myPID} | Stop-Process -Force
+
 # 一時停止
 Start-Sleep -Seconds 1
 
