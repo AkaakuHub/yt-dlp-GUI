@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.2.1";
+        private string version = "v2.2.2";
 
 
         private Process ytDlpProcess;
@@ -176,21 +176,24 @@ namespace yt_dlp_GUI
 
             string command = "";
 
-            if (url == "")
+            if (kind != 13)
             {
-                this.Invoke((MethodInvoker)delegate
+                if (url == "")
                 {
-                    MessageBox.Show(this, "URLを入力してください。");
-                });
-                return;
-            }
-            else if (!url.StartsWith("http"))
-            { 
-                this.Invoke((MethodInvoker)delegate
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        MessageBox.Show(this, "URLを入力してください。");
+                    });
+                    return;
+                }
+                else if (!url.StartsWith("http"))
                 {
-                    MessageBox.Show(this, $"URLの形式が正しくありません。\n{url}は有効なURLではありません。");
-                });
-                return;
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        MessageBox.Show(this, $"URLの形式が正しくありません。\n{url}は有効なURLではありません。httpから始まる必要があります。");
+                    });
+                    return;
+                }
             }
 
             switch (kind) {
@@ -577,6 +580,9 @@ $newConfigKeys = @()
 # アップデート中と表示
 echo ""yt-dlp-GUIをアップデート中...""
 
+# 古いexeファイルを終了, PIDを参照してキル
+Get-Process -Id {myPID} | Stop-Process -Force
+
 # ダウンロード
 Invoke-WebRequest -Uri ""{downloadUrl}"" -OutFile $zipPath
 
@@ -611,12 +617,6 @@ if (Test-Path $oldConfigPath) {{
 
 # 新しいファイルのパス
 $newExePath = Join-Path $extractPath ""yt-dlp-GUI.exe""
-
-# 古いexeファイルを終了, PIDを参照してキル
-Get-Process -Id {myPID} | Stop-Process -Force
-
-# 一時停止
-Start-Sleep -Seconds 1
 
 # 置き換え
 # もともとのexeがあるので、先に削除
