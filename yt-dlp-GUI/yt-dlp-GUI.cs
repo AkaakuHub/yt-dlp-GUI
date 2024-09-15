@@ -28,7 +28,7 @@ namespace yt_dlp_GUI
 {
     public partial class Form1 : Form
     {
-        private string version = "v2.2.2";
+        private string version = "v2.3.0";
 
 
         private Process ytDlpProcess;
@@ -497,6 +497,11 @@ namespace yt_dlp_GUI
         {
             async void versionUpdater()
             {
+
+                MessageBox.Show(this, "まったく新しいバージョン(https://github.com/AkaakuHub/yt-dlp-GUI-2)がリリースされました！(自動でURLが開かれます。)\n\nぜひそちらへの移行をお願いします。(こちらの古いプロジェクトはメンテナンスされなくなります。)");
+
+                OpenUrl("https://github.com/AkaakuHub/yt-dlp-GUI-2");
+
                 // ネットワーク接続の確認
                 if (!NetworkInterface.GetIsNetworkAvailable())
                 {
